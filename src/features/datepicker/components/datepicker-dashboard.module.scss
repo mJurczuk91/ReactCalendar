@@ -1,0 +1,35 @@
+@import '../../../variables';
+
+.container div{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-weight: 300;
+    font-size: small;
+    height: 2rem;
+    width: 2rem;
+}
+
+.currentMonth{
+    font-weight: 500 !important;
+}
+
+.today{
+    color: rgb(210, 227, 252);
+    font-weight: 500 !important;
+    background-color: rgb(26, 115, 232) !important;
+    border-radius: 50%;
+}
+
+.pickedDay{
+    font-weight: 500 !important;
+    background-color: rgb(210, 227, 252);
+    border-radius: 50%;
+}
+
+.container {
+    max-width: fit-content;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+}

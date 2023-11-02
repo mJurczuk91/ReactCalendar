@@ -1,0 +1,9 @@
+.resizer {
+    background: #000;
+    width: 100%;
+    height: 2px;
+}
+
+.resizer:hover {
+    cursor: row-resize;
+}

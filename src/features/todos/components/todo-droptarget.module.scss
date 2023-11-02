@@ -1,0 +1,13 @@
+.draggedOver {
+    -webkit-box-shadow: inset 0px 0px 26px 0px rgba(74, 204, 61, 1);
+    -moz-box-shadow: inset 0px 0px 26px 0px rgba(74, 204, 61, 1);
+    box-shadow: inset 0px 0px 26px 0px rgba(74, 204, 61, 1);
+}
+
+.target {
+    height:3rem; 
+    width:100%; 
+    border-top: 1px solid rgba(128, 128, 128, 50%);
+    border-left: 1px solid rgba(128, 128, 128, 50%);
+    position: relative;
+}

@@ -1,0 +1,19 @@
+.timestamp{
+    height:3rem; 
+    width:100%; 
+    border-top: 1px solid rgba(128, 128, 128, 50%);
+    border-left: 1px solid rgba(128, 128, 128, 50%);
+    position: relative;
+}
+.timestamp:last-of-type{
+    border-bottom: 1px solid rgba(128, 128, 128, 50%);
+    margin-bottom: 6rem;
+}
+.container{
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.todo {
+    position: absolute;
+}
