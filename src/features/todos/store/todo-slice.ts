@@ -2,14 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../store/store";
 
 export interface ITodo {
-    id?: number,
+    id: number,
     description: string,
     dateStart: number,
     dateEnd: number,
 }
 
 
-const initialState: { list: ITodo[], counter: number } = { list: [], counter: 1 };
+const initialState: { list: ITodo[], idCounter: number } = { list: [], idCounter: 1 };
 
 const TodoSlice = createSlice({
     name: "todoSlice",
@@ -18,9 +18,8 @@ const TodoSlice = createSlice({
         createTodo(state, action: PayloadAction<ITodo>) {
             state.list = [...state.list, {
                 ...action.payload,
-                id: state.counter,
             }];
-            state.counter++;
+            state.idCounter++;
         },
         updateTodo(state, action: PayloadAction<ITodo>) {
             state.list = state.list.map(todo => {

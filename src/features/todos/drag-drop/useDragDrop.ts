@@ -5,7 +5,7 @@ export enum dragActions {
     'changeStartDate', 'changeEndDate'
 }
 export interface IDraggedd {
-    id: number|undefined,
+    todo: ITodo,
     action: dragActions
 }
 
@@ -25,7 +25,7 @@ const useDragDrop = () => {
         if(!currentlyDragged) return;
         switch(currentlyDragged.action) {
             case dragActions.changeStartDate:
-                updateTodoStartDate(currentlyDragged.id, droppedOnDate);
+                updateTodoStartDate(currentlyDragged.todo, droppedOnDate);
                 stopDrag();
                 return;
         }

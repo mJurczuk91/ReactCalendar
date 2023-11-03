@@ -4,11 +4,11 @@ import useDragDrop from '../drag-drop/useDragDrop';
 
 interface Props {
     timestamp: number;
-    editTodo: (timestamp:number) => void;
+    createTodo: (timestamp:number) => void;
     children?: React.ReactNode;
 }
 
-const TodoDroptarget:React.FC<Props> = ({timestamp, editTodo, children}) => {
+const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
     const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
     const {handleDrop} = useDragDrop();
 
@@ -27,8 +27,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, editTodo, children}) => {
     const handleClick = (e:React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        editTodo(timestamp);
-        console.log('clicked on droptarget');
+        createTodo(timestamp);
     }
 
     return <div

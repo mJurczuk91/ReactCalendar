@@ -3,13 +3,17 @@ import { ITodo, selectTodos } from "../store/todo-slice";
 import { useAppDispatch } from "../../../store/redux-hooks";
 import { createTodo, updateTodo, deleteTodo } from "../store/todo-slice";
 import React, { useEffect, useState } from "react";
-import { addXStepsToTimestamp } from "../../calendar/utils/date-utils";
+import { addXStepsToTimestamp, getTimeDiffInMinutes, calendarStepInMinutes } from "../../calendar/utils/date-utils";
 
 let editedTodo: ITodo | null = null;
 let listeners: React.Dispatch<React.SetStateAction<ITodo[] | undefined>>[] = [];
 let todos = [] as ITodo[];
 
 const useTodos = () => {
+    const dispatch = useAppDispatch();
+    todos = useAppSelector(selectTodos).list;
+    const nextUnusedId = useAppSelector(selectTodos).idCounter;
+
     const setState = useState<ITodo[]>()[1];
     useEffect(() => {
         listeners.push(setState);
@@ -20,62 +24,54 @@ const useTodos = () => {
 
     const notifyListeners = () => {
         let updates = editedTodo ? todos.concat(editedTodo) : todos;
-        for(let l of listeners){
+        for (let l of listeners) {
             l(updates);
         }
     }
 
-    const dispatch = useAppDispatch();
-    todos = useAppSelector(selectTodos).list;
-
-    const getTodos = ():ITodo[] => {
-        return editedTodo ? todos.concat(editedTodo) : todos;
+    const getTodos = (): ITodo[] => {
+        return todos;
     }
 
-    const startEditingTodo = (date: number) => {
-        const todo = todos.find(t => t.dateStart === date);
-        editedTodo = todo ? { ...todo } : { id: undefined, dateStart: date, dateEnd: addXStepsToTimestamp(date, 1), description: '' };
+    const newTodo = (date: number) => {
+        const newTodo = { id: nextUnusedId, dateStart: date, dateEnd: addXStepsToTimestamp(date, 1), description: '' }
+        dispatch(createTodo({ ...newTodo }));
+        startEditingTodo({ ...newTodo })
+    }
+
+    const startEditingTodo = (todo: ITodo) => {
+        editedTodo = todo;
         notifyListeners();
     }
 
-    const updateTodoStartDate = (id:number|undefined, newStartDate:number) => {
-        if(id) {
-            console.log('updating todo start date');
-            const todo = todos.find(t => t.id === id);
-            if(todo !== undefined) {
-                saveTodo({...todo, dateStart: newStartDate} );
-            }
-        }
-        else{
-            if(editedTodo !== null){
-                editedTodo = {...editedTodo, dateStart: newStartDate};
-                notifyListeners();
-            }
-        }
+    const updateTodoStartDate = (todo: ITodo, newStartDate: number) => {
+        const todoLength = getTimeDiffInMinutes(todo.dateStart, todo.dateEnd);
+        saveTodo({
+            ...todo,
+            dateStart: newStartDate,
+            dateEnd: addXStepsToTimestamp(newStartDate, todoLength / calendarStepInMinutes
+            )
+        });
     }
 
-    const updateTodoDescription = (description:string) => {
-        if(editedTodo !== null) {
+    const updateTodoDescription = (description: string) => {
+        if (editedTodo !== null) {
+            console.log('DESCRIPTION');
             editedTodo.description = description;
             saveTodo(editedTodo);
         }
     }
 
-    const saveTodo = (todo?:ITodo) => {
-        let todoToSave = todo ? todo : editedTodo;
-        if(!todoToSave) return;
-        if (todoToSave.id === undefined) {
-            dispatch(createTodo(todoToSave));
-            editedTodo = null;
-        } else {
-            dispatch(updateTodo(todoToSave));
-            editedTodo = null;
-        }
+    const saveTodo = (todo?: ITodo) => {
+        const todoToSave = todo ? todo : editedTodo;
+        if (!todoToSave) return;
+        dispatch(updateTodo(todoToSave));
+        editedTodo = null;
         notifyListeners();
-    };
+    }
 
-    
-    return { getTodos, editedTodo, updateTodoDescription, updateTodoStartDate, startEditingTodo, saveTodo, deleteTodo: (todo: ITodo) => { dispatch(deleteTodo(todo)); } }
+
+    return { getTodos, editedTodo, updateTodoDescription, updateTodoStartDate, newTodo, startEditingTodo, saveTodo, deleteTodo: (todo: ITodo) => { dispatch(deleteTodo(todo)); } }
 }
 
 export default useTodos;

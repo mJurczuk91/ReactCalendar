@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ITodo } from "../store/todo-slice";
 import ResizeHandlebar from "./resize-handlebar";
 import useDragDrop, {dragActions} from "../drag-drop/useDragDrop";
@@ -11,16 +11,14 @@ interface Props {
 
 
 const Todo:React.FC<Props> = ({todo, saveTodo}, ) => {
+    const defaultHeight = 48;
     const [currentHeight, setCurrentHeight] = useState<number>(() => {
-        console.log(getTimeDiffInMinutes(todo.dateStart, todo.dateEnd));
-        console.log(todo.dateStart);
-        console.log(todo.dateEnd);
-        return getTimeDiffInMinutes(todo.dateStart, todo.dateEnd) / calendarStepInMinutes * 48;
+        return getTimeDiffInMinutes(todo.dateStart, todo.dateEnd) / calendarStepInMinutes * defaultHeight;
     });
     const {startDrag, stopDrag} = useDragDrop();
 
     const dragStartHandler = (e:React.DragEvent) => {
-        startDrag({id: todo.id, action: dragActions.changeStartDate});
+        startDrag({todo, action: dragActions.changeStartDate});
         e.dataTransfer.setDragImage(e.currentTarget, e.clientX - e.currentTarget.getBoundingClientRect().left, 0);
     };
 
@@ -36,24 +34,22 @@ const Todo:React.FC<Props> = ({todo, saveTodo}, ) => {
             case resizeDirection.up:
                 window.addEventListener('mousemove', handleResizingUp);
                 window.addEventListener('mouseup', stopResizingUp)
-                console.log('inside up');
                 break;
             case resizeDirection.down:
                 window.addEventListener('mousemove', handleResizingDown);
                 window.addEventListener('mouseup', stopResizingDown)
-                console.log('inside up');
                 break;
         }
     }
 
     const handleResizingUp = (e:MouseEvent) => {
-        let yDistanceMoved = (e.pageY - resizeStartMouseYPos)
-        setCurrentHeight(resizeStartHeight + yDistanceMoved)
+        const yDistanceMoved = (resizeStartMouseYPos - e.pageY)
+        setCurrentHeight(Math.max(defaultHeight, resizeStartHeight + yDistanceMoved));
     }
 
     const handleResizingDown = (e:MouseEvent) => {
-        let yDistanceMoved = (e.pageY - resizeStartMouseYPos)
-        setCurrentHeight(resizeStartHeight + yDistanceMoved)    
+        const yDistanceMoved = (e.pageY - resizeStartMouseYPos)
+        setCurrentHeight(Math.max(defaultHeight, resizeStartHeight + yDistanceMoved));
     }
 
     const stopResizingUp = () => {
