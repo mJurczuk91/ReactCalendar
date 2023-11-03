@@ -6,7 +6,7 @@ interface Props {
     handleMouseUp: (e:React.MouseEvent) => void,
 }
 
-const Resizer:React.FC<Props> = ({onResize, handleMouseDown, handleMouseUp}) => {
+const ResizeHandlebar:React.FC<Props> = ({onResize, handleMouseDown, handleMouseUp}) => {
     return <>
         <div 
             className={classes.resizer}
@@ -16,4 +16,4 @@ const Resizer:React.FC<Props> = ({onResize, handleMouseDown, handleMouseUp}) => 
     </>
 }
 
-export default Resizer; 
+export default ResizeHandlebar; 

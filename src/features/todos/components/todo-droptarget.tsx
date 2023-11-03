@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import classes from './todo-droptarget.module.scss';
 import useDragDrop from '../drag-drop/useDragDrop';
 
@@ -33,7 +33,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, editTodo, children}) => {
 
     return <div
         onDragEnter={() => { setIsDraggedOver(true) }}
-        onDragExit={() => { setIsDraggedOver(false) }}
+        onDragLeave={() => { setIsDraggedOver(false) }}
         onDragOver={handleDragOver}
         onDrop={droppedOn}
         onClick={handleClick}

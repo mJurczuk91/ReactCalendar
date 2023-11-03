@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 //import classes from "./todo.module.scss";
 import { ITodo } from "../store/todo-slice";
-import Resizer from "./resizer";
+import Resizer from "./resize-handlebar";
 import useDragDrop, {dragActions} from "../drag-drop/useDragDrop";
 import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/utils/calendar-utils";
 
@@ -13,7 +13,8 @@ interface Props {
 let resizeStartY:number|null = null;
 
 const Todo:React.FC<Props> = ({todo, saveTodo}, ) => {
-    const [isResizing, setIsResizing] = useState(false);
+    const [isResizing, setIsResizing] = useState<boolean>(false);
+    const [currentHeight, setCurrentHeight] = useState<number>(48);
     const ref = useRef<HTMLDivElement>(null);
     const {startDrag, stopDrag} = useDragDrop();
 
@@ -66,9 +67,8 @@ const Todo:React.FC<Props> = ({todo, saveTodo}, ) => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         backgroundColor: 'red',
-        height: ``+(3*verticalSizeMultiplier - 0.3)+`em`,
+        height: currentHeight+`px`,
         minWidth: '95%',
-        zIndex: 2
     };
 
     return <>
