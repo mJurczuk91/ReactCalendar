@@ -3,6 +3,7 @@ import { ITodo, selectTodos } from "../store/todo-slice";
 import { useAppDispatch } from "../../../store/redux-hooks";
 import { createTodo, updateTodo, deleteTodo } from "../store/todo-slice";
 import React, { useEffect, useState } from "react";
+import { addXStepsToTimestamp } from "../../calendar/utils/date-utils";
 
 let editedTodo: ITodo | null = null;
 let listeners: React.Dispatch<React.SetStateAction<ITodo[] | undefined>>[] = [];
@@ -33,7 +34,7 @@ const useTodos = () => {
 
     const startEditingTodo = (date: number) => {
         const todo = todos.find(t => t.dateStart === date);
-        editedTodo = todo ? { ...todo } : { id: undefined, dateStart: date, dateEnd: date, description: '' };
+        editedTodo = todo ? { ...todo } : { id: undefined, dateStart: date, dateEnd: addXStepsToTimestamp(date, 1), description: '' };
         notifyListeners();
     }
 

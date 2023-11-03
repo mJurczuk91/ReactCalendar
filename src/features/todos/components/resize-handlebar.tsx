@@ -1,18 +1,15 @@
-import classes from "./resizer.module.css";
+import classes from "./resize-handlebar.module.css";
 
 interface Props {
-    onResize: (e:React.MouseEvent) => void,
     handleMouseDown: (e:React.MouseEvent) => void,
-    handleMouseUp: (e:React.MouseEvent) => void,
 }
 
-const ResizeHandlebar:React.FC<Props> = ({onResize, handleMouseDown, handleMouseUp}) => {
+const ResizeHandlebar:React.FC<Props> = ({handleMouseDown}) => {
     return <>
         <div 
             className={classes.resizer}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={onResize}></div>
+            onMouseDown={handleMouseDown}>
+        </div>
     </>
 }
 

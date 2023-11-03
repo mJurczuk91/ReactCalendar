@@ -1,6 +1,6 @@
 import CalendarTopbar from "./calendar-topbar";
 import CalendarHourlist from "./calendar-hourlist";
-import { createIntervalTimestamps } from "../utils/calendar-utils";
+import { createIntervalTimestamps } from "../utils/date-utils";
 import CalendarTimestampedNotesArea from "./calendar-timestamped-notes-area";
 import { useAppSelector } from "../../../store/redux-hooks";
 import { selectPickedDate } from "../../datepicker/store/datepicker.slice";

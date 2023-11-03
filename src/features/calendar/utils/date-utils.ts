@@ -1,3 +1,6 @@
+
+export const calendarStepInMinutes = 15;
+
 export const getLastDayOfMonth = (m: number, y: number):number => {
     m=m+1;
     return m===2 ? y & 3 || (!(y%25) && y & 15) ? 28 : 29 : 30 + (m+(m>>3)&1);
@@ -73,4 +76,27 @@ export const getMonthNameInPolish = (month:number):string => {
 export const padWithZeros = (a:number) => {
     if(a.toString().length === 1) return '0'+a.toString();
     else return a;
-}
+};
+
+export const createIntervalTimestamps = (pickedDate: Date): Date[] => {
+    let hours = [];
+    let date = new Date(pickedDate);
+    date.setHours(0, 0, 0);
+    while (date.getDate() === pickedDate.getDate()) {
+        hours.push(new Date(date));
+        date = new Date(date.getTime() + calendarStepInMinutes * 60000);
+    }
+    return hours;
+};
+
+export const getTimeDiffInMinutes = (a: number, b: number) => {
+    if (a > b) {
+        return (a - b) / 60000;
+    }
+    else return (b - a) / 60000;
+};
+
+export const addXStepsToTimestamp = (timestamp: number, x: number):number =>{
+    return timestamp + x * (calendarStepInMinutes * 60000);
+};
+

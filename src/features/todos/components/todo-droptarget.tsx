@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import classes from './todo-droptarget.module.scss';
 import useDragDrop from '../drag-drop/useDragDrop';
 

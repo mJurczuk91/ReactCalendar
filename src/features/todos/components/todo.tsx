@@ -1,64 +1,78 @@
-import { useEffect, useRef, useState } from "react";
-//import classes from "./todo.module.scss";
+import { useEffect, useState } from "react";
 import { ITodo } from "../store/todo-slice";
-import Resizer from "./resize-handlebar";
+import ResizeHandlebar from "./resize-handlebar";
 import useDragDrop, {dragActions} from "../drag-drop/useDragDrop";
-import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/utils/calendar-utils";
+import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/utils/date-utils";
 
 interface Props {
     todo: ITodo,
     saveTodo: () => void,
 }
 
-let resizeStartY:number|null = null;
 
 const Todo:React.FC<Props> = ({todo, saveTodo}, ) => {
-    const [isResizing, setIsResizing] = useState<boolean>(false);
-    const [currentHeight, setCurrentHeight] = useState<number>(48);
-    const ref = useRef<HTMLDivElement>(null);
+    const [currentHeight, setCurrentHeight] = useState<number>(() => {
+        console.log(getTimeDiffInMinutes(todo.dateStart, todo.dateEnd));
+        console.log(todo.dateStart);
+        console.log(todo.dateEnd);
+        return getTimeDiffInMinutes(todo.dateStart, todo.dateEnd) / calendarStepInMinutes * 48;
+    });
     const {startDrag, stopDrag} = useDragDrop();
-
-    let verticalSizeMultiplier = 1;
-    useEffect(() => {
-        verticalSizeMultiplier = getTimeDiffInMinutes(todo.dateEnd, todo.dateStart) / calendarStepInMinutes;
-    }, [todo]);
-    console.log('size = ', verticalSizeMultiplier);
 
     const dragStartHandler = (e:React.DragEvent) => {
         startDrag({id: todo.id, action: dragActions.changeStartDate});
         e.dataTransfer.setDragImage(e.currentTarget, e.clientX - e.currentTarget.getBoundingClientRect().left, 0);
     };
 
-    const handleMouseDown = (e:React.MouseEvent) => {
+    let resizeStartMouseYPos = 0;
+    let resizeStartHeight = currentHeight;
+    enum resizeDirection {up, down};
+    const startResizing = (e:React.MouseEvent, direction:resizeDirection) => {
         e.preventDefault();
         e.stopPropagation();
-        resizeStartY = e.clientY;
-        setIsResizing(true);
+        resizeStartMouseYPos = e.pageY;
+        resizeStartHeight = currentHeight;
+        switch(direction){
+            case resizeDirection.up:
+                window.addEventListener('mousemove', handleResizingUp);
+                window.addEventListener('mouseup', stopResizingUp)
+                console.log('inside up');
+                break;
+            case resizeDirection.down:
+                window.addEventListener('mousemove', handleResizingDown);
+                window.addEventListener('mouseup', stopResizingDown)
+                console.log('inside up');
+                break;
+        }
     }
 
-    const handleMouseUp = (e:React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        resizeStartY = null;
-        setIsResizing(false);
+    const handleResizingUp = (e:MouseEvent) => {
+        let yDistanceMoved = (e.pageY - resizeStartMouseYPos)
+        setCurrentHeight(resizeStartHeight + yDistanceMoved)
+    }
+
+    const handleResizingDown = (e:MouseEvent) => {
+        let yDistanceMoved = (e.pageY - resizeStartMouseYPos)
+        setCurrentHeight(resizeStartHeight + yDistanceMoved)    
+    }
+
+    const stopResizingUp = () => {
+        window.removeEventListener('mousemove', handleResizingUp);
+        window.removeEventListener('mouseup', stopResizingUp);
+        resizeStartMouseYPos = 0;
+        resizeStartHeight = 0;
+    }
+
+    const stopResizingDown = () => {
+        window.removeEventListener('mousemove', handleResizingDown);
+        window.removeEventListener('mouseup', stopResizingDown);
+        resizeStartMouseYPos = 0;
+        resizeStartHeight = 0;
     }
 
     const handleMouseClick = (e:React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-    }
-
-    const handleResize = (e:React.MouseEvent) => {
-/*         e.preventDefault();
-        if(!isResizing) return;
-        console.log('resizing true');
-        if(ref.current === null) return;
-        console.log('ref.current not nsetVerticalSizeMultiplier(sizeMultiplier);ull');
-        if(resizeStartY === null) return;
-        console.log('resizeStartY not null');
-        console.log(resizeStartY);
-        console.log(e.clientY);
-        ref.current.style.height = `${resizeStartY + e.clientY}px`; */
     }
 
     let style:React.CSSProperties = {
@@ -69,19 +83,22 @@ const Todo:React.FC<Props> = ({todo, saveTodo}, ) => {
         backgroundColor: 'red',
         height: currentHeight+`px`,
         minWidth: '95%',
+        zIndex: 2,
     };
 
     return <>
-    <div //className={classes.todo}
+    <div
     draggable
     onDragStart={dragStartHandler}
     onClick={handleMouseClick}
-    style={style}
-    ref={ref}
-    >
-        <Resizer onResize={handleResize} handleMouseDown={handleMouseDown} handleMouseUp={handleMouseUp}/>
+    style={style}>
+        <ResizeHandlebar handleMouseDown={(e) => {
+            startResizing(e, resizeDirection.up);
+        }}/>
         {todo.description}
-        <Resizer onResize={handleResize} handleMouseDown={handleMouseDown} handleMouseUp={handleMouseUp}/>
+        <ResizeHandlebar handleMouseDown={(e) => {
+            startResizing(e, resizeDirection.down);
+        }}/>
     </div>
     </>
 };
