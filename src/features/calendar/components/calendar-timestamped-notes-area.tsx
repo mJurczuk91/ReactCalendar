@@ -10,8 +10,9 @@ import TodoEditModal from "../../todos/components/todo-edit-modal";
 
 
 const CalendarTimestampedNotesArea: React.FC<{ children?: React.ReactNode, intervalTimestamps: Date[], pickedDate: Date }> = ({ intervalTimestamps, pickedDate }) => {
-    const { getTodos, saveTodo, editedTodo, updateTodoDescription, newTodo ,startEditingTodo } = useTodos();
+    const { getTodos, editedTodo, updateTodoDescription, newTodo} = useTodos();
     const todos = getTodos();
+    console.log('calendar timestamped notes rerendered');
     return <>
         {editedTodo && createPortal(
             <TodoEditModal todo={editedTodo as ITodo} updateTodoDescription={updateTodoDescription} />,
@@ -28,7 +29,6 @@ const CalendarTimestampedNotesArea: React.FC<{ children?: React.ReactNode, inter
                         {todo &&
                             <Todo
                                 todo={todo}
-                                saveTodo={saveTodo}
                                 key={`${todo.id}`}
                             />}
                     </TodoDroptarget>

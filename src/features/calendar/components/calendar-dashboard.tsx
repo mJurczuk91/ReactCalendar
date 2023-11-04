@@ -12,7 +12,7 @@ import classes from "./calendar-dashboard.module.scss";
 const CalendarDashboard: React.FC = () => {
     const { pickedDay, pickedMonth, pickedYear } = useAppSelector(selectPickedDate);
     const intervalTimestamps = createIntervalTimestamps(new Date(pickedYear, pickedMonth, pickedDay));
-
+    
     return <div className={classes.container}>
         <CalendarTopbar
             pickedDay={pickedDay}

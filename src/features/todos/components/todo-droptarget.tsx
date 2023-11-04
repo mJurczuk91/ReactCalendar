@@ -10,12 +10,7 @@ interface Props {
 
 const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
     const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
-    const {handleDrop} = useDragDrop();
-
-    const handleDragOver = (e:React.DragEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-    }
+    let {updateLastDraggedOver, handleDrop, currentlyDragged} = useDragDrop();
 
     const droppedOn = (e:React.DragEvent) => {
         e.stopPropagation();
@@ -30,12 +25,23 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
         createTodo(timestamp);
     }
 
+    const handleMouseOver = () => {
+        if(!currentlyDragged) return;
+        updateLastDraggedOver(timestamp);
+        console.log('last dragged over: '+timestamp);
+    }
+
     return <div
         onDragEnter={() => { setIsDraggedOver(true) }}
         onDragLeave={() => { setIsDraggedOver(false) }}
-        onDragOver={handleDragOver}
         onDrop={droppedOn}
+        //ondragover prevent default needed for ondrop to work properly (?!)
+        onDragOver={(e:React.DragEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+        }}
         onClick={handleClick}
+        onMouseOver={handleMouseOver}
         className={`${classes.target} ${isDraggedOver ? classes.draggedOver : ''}`}
         >
 
