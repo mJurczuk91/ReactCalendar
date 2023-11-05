@@ -56,7 +56,7 @@ const Todo:React.FC<Props> = ({todo}, ) => {
     const handleResizingUp = (e:MouseEvent) => {
         const yDistanceMoved = (resizeStartMouseYPos - e.pageY)
         setCurrentHeight(Math.max(defaultHeight, resizeStartHeight + yDistanceMoved));
-        setCurrentPosYOffset(-Math.max(0, yDistanceMoved));
+        setCurrentPosYOffset(-Math.max((defaultHeight - resizeStartHeight), yDistanceMoved));
     }
 
     const handleResizingDown = (e:MouseEvent) => {
