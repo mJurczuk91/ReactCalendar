@@ -1,6 +1,7 @@
 import { ITodo } from "../store/todo-slice";
 import useTodos from "../hooks/useTodos";
 import { useState, useEffect } from "react";
+import { addXStepsToTimestamp } from "../../calendar/utils/date-utils";
 
 export enum dragActions {
     'changeStartDate', 'changeEndDate'
@@ -15,7 +16,7 @@ let lastTargetTimestamp: number | null;
 let listeners: React.Dispatch<React.SetStateAction<IDraggedd | null>>[] = [];
 
 const useDragDrop = () => {
-    const { updateTodoStartDate, updateTodoEndDate } = useTodos();
+    const { updateTodoStartDate, updateTodoEndDate, moveTodo } = useTodos();
     const setState = useState<IDraggedd | null>(currentlyDragged)[1];
     useEffect(() => {
         listeners.push(setState);
@@ -25,7 +26,7 @@ const useDragDrop = () => {
     }, [setState]);
 
     const notifyListeners = () => {
-        for(let l of listeners){ l(currentlyDragged); }
+        for (let l of listeners) { l(currentlyDragged); }
     }
 
     const startDrag = (todo: ITodo, action: dragActions) => {
@@ -38,7 +39,6 @@ const useDragDrop = () => {
     }
 
     const stopDrag = () => {
-        console.log(`currently dragged`);
         if (!currentlyDragged || !lastTargetTimestamp) {
             cleanup();
             return;
@@ -48,7 +48,10 @@ const useDragDrop = () => {
                 updateTodoStartDate(currentlyDragged.todo, lastTargetTimestamp);
                 break;
             case dragActions.changeEndDate:
-                updateTodoEndDate(currentlyDragged.todo, lastTargetTimestamp);
+/*              calendar fields are numbered at the top, so if the task is dropped between hour 00:00 and 00:15,
+                it will read time as 00:00. It works for creating task or setting start time, but if im trying 
+                to change the end date, i want the task stretching all the way to 00:15, so i add 15 minutes */
+                updateTodoEndDate(currentlyDragged.todo, addXStepsToTimestamp(lastTargetTimestamp, 1));
                 break;
         }
         cleanup();
@@ -57,7 +60,7 @@ const useDragDrop = () => {
     const handleDrop = (droppedOnDate: number) => {
         console.log('handledrop, current: ' + currentlyDragged);
         if (!currentlyDragged) return;
-        updateTodoStartDate(currentlyDragged.todo, droppedOnDate);
+        moveTodo(currentlyDragged.todo, droppedOnDate);
         console.log("handledrop");
         cleanup();
     }

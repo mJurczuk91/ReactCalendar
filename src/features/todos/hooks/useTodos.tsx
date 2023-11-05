@@ -44,19 +44,25 @@ const useTodos = () => {
         notifyListeners();
     }
 
-    const updateTodoStartDate = (todo: ITodo, newStartDate: number) => {
+    const moveTodo = (todo: ITodo, newStartDate:number) => {
         const todoLength = getTimeDiffInMinutes(todo.dateStart, todo.dateEnd);
         saveTodo({
             ...todo,
             dateStart: newStartDate,
-            dateEnd: addXStepsToTimestamp(newStartDate, todoLength / calendarStepInMinutes
-            )
+            dateEnd: addXStepsToTimestamp(newStartDate, todoLength / calendarStepInMinutes),
+        });
+    }
+
+    const updateTodoStartDate = (todo: ITodo, newStartDate: number) => {
+        saveTodo({
+            ...todo,
+            dateStart: newStartDate,
         });
     }
 
     const updateTodoEndDate = (todo: ITodo, newEndDate: number) => {
         const endDate = new Date(newEndDate);
-        console.log(`changing end date from ${todo.dateEnd} to ${endDate.toLocaleString()}`);
+        console.log(`changing end date from ${new Date(todo.dateEnd).toLocaleString()} to ${endDate.toLocaleString()}`);
         saveTodo({
             ...todo,
             dateEnd: newEndDate,
@@ -80,7 +86,7 @@ const useTodos = () => {
     }
 
 
-    return { getTodos, editedTodo, updateTodoDescription, updateTodoStartDate, updateTodoEndDate, newTodo, startEditingTodo, saveTodo, deleteTodo: (todo: ITodo) => { dispatch(deleteTodo(todo)); } }
+    return { getTodos, editedTodo, updateTodoDescription, updateTodoStartDate, updateTodoEndDate, newTodo, startEditingTodo, saveTodo, moveTodo, deleteTodo: (todo: ITodo) => { dispatch(deleteTodo(todo)); } }
 }
 
 export default useTodos;

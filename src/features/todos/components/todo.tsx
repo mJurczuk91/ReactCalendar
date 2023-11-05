@@ -11,6 +11,7 @@ export enum resizeDirection {up, down};
 
 const Todo:React.FC<Props> = ({todo}, ) => {
     const defaultHeight = 48;
+    const [currentPosYOffset, setCurrentPosYOffset] = useState<number>(0);
     const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart, todo.dateEnd));  
     const {startDrag, stopDrag} = useDragDrop();
     const [pointerEvents, setPointerEvents] = useState<boolean>(true);
@@ -32,9 +33,9 @@ const Todo:React.FC<Props> = ({todo}, ) => {
 
     let resizeStartMouseYPos = 0;
     let resizeStartHeight = currentHeight;
-
     const startResizing = (e:React.MouseEvent, direction:resizeDirection) => {
         e.preventDefault();
+        e.stopPropagation();
         resizeStartMouseYPos = e.pageY;
         resizeStartHeight = currentHeight;
         setPointerEvents(false);
@@ -55,7 +56,7 @@ const Todo:React.FC<Props> = ({todo}, ) => {
     const handleResizingUp = (e:MouseEvent) => {
         const yDistanceMoved = (resizeStartMouseYPos - e.pageY)
         setCurrentHeight(Math.max(defaultHeight, resizeStartHeight + yDistanceMoved));
-
+        setCurrentPosYOffset(-Math.max(0, yDistanceMoved));
     }
 
     const handleResizingDown = (e:MouseEvent) => {
@@ -97,8 +98,10 @@ const Todo:React.FC<Props> = ({todo}, ) => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         backgroundColor: 'red',
-        height: currentHeight+`px`,
         minWidth: '95%',
+
+        top: currentPosYOffset,
+        height: currentHeight+`px`,
         pointerEvents: pointerEvents ? 'all' : 'none',
         zIndex: 2,
     };

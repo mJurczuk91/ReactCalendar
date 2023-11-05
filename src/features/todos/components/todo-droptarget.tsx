@@ -28,7 +28,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
     const handleMouseOver = () => {
         if(!currentlyDragged) return;
         updateLastDraggedOver(timestamp);
-        console.log('last dragged over: '+timestamp);
+        console.log('last dragged over: '+new Date(timestamp).toLocaleString());
     }
 
     return <div
