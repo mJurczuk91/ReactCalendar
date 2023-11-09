@@ -1,7 +1,7 @@
 .resizer {
     background: #000;
     width: 100%;
-    height: 2px;
+    height: 5px;
 }
 
 .resizer:hover {
