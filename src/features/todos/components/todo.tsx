@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
 import { ITodo } from "../store/todo-slice";
 import ResizeHandlebar from "./resize-handlebar";
-import useDragDrop, {dragActions} from "../drag-drop/useDragDrop";
 import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/utils/date-utils";
 
 interface Props {
     todo: ITodo,
     calendarFieldHeight: number,
+    drag: {status:ITodoDrag|null, setDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>}
 }
-export enum resizeDirection {up, down};
 
-const Todo:React.FC<Props> = ({todo, calendarFieldHeight}) => {
-    
-    const [currentPosYOffset, setCurrentPosYOffset] = useState<number>(0);
+export enum TodoDragActions {
+    move,
+    resize,
+}
+
+export interface ITodoDrag{
+    todo: ITodo,
+    dragAction: TodoDragActions,
+}
+
+const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
+
     const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart, todo.dateEnd));  
-    const {startDrag, stopDrag, currentlyDragged} = useDragDrop();
     const [pointerEvents, setPointerEvents] = useState<boolean>(true);
 
     useEffect(() => {
@@ -27,18 +34,17 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight}) => {
     }, [todo.dateStart, todo.dateEnd, todo])
 
     useEffect(() => {
-        if(currentlyDragged) setPointerEvents(false);
+        if(drag.status) setPointerEvents(false);
         else setPointerEvents(true);
-    }, [currentlyDragged]);
+    }, [drag]);
 
-    const dragStartHandler = (e:React.DragEvent) => {
-        console.log('starting drag');
-        startDrag(todo, dragActions.changeStartDate);
+    const handleDragStart = (e:React.DragEvent) => {
+        drag.setDragStatus({todo, dragAction: TodoDragActions.move});
         e.dataTransfer.setDragImage(e.currentTarget, e.clientX - e.currentTarget.getBoundingClientRect().left, 0);
     };
 
-    const startResizing = (e:React.MouseEvent, direction:resizeDirection) => {
-        startDrag(todo, dragActions.changeEndDate);
+    const startResizing = (e:React.MouseEvent) => {
+        drag.setDragStatus({todo, dragAction: TodoDragActions.resize});
     }
 
     const handleMouseClick = (e:React.MouseEvent) => {
@@ -57,8 +63,6 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight}) => {
         justifyContent: 'space-between',
         backgroundColor: 'red',
         minWidth: '95%',
-
-        top: currentPosYOffset,
         height: currentHeight+`px`,
         pointerEvents: pointerEvents ? 'all' : 'none',
         zIndex: 2,
@@ -67,12 +71,11 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight}) => {
     return <>
     <div
     draggable
-    onDragStart={dragStartHandler}
+    onDragStart={handleDragStart}
     onClick={handleMouseClick}
     style={style}>
-        <ResizeHandlebar resizeDirection={resizeDirection.up} handleMouseDown={startResizing}/>
         {todo.description}
-        <ResizeHandlebar resizeDirection={resizeDirection.down} handleMouseDown={startResizing}/>
+        <ResizeHandlebar handleStartResizing={startResizing}/>
     </div>
     </>
 };
