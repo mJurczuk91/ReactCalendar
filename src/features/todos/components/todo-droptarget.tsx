@@ -1,21 +1,30 @@
 import { useState } from 'react';
 import classes from './todo-droptarget.module.scss';
 import useDragDrop from '../drag-drop/useDragDrop';
+import { dragActions } from '../drag-drop/useDragDrop';
+import { ITodo } from '../store/todo-slice';
 
 interface Props {
     timestamp: number;
     createTodo: (timestamp:number) => void;
+    saveTodo: (todo:ITodo) => void;
     children?: React.ReactNode;
 }
 
-const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
+const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children, saveTodo}) => {
     const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
     let {updateLastDraggedOver, handleDrop, currentlyDragged} = useDragDrop();
 
     const droppedOn = (e:React.DragEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        handleDrop(timestamp);
+
+    }
+
+    const handleDragEnter = () => {
+        setIsDraggedOver(true);
+        if(currentlyDragged?.action === dragActions.changeEndDate) saveTodo({...currentlyDragged.todo, dateEnd: timestamp});
+    }
+
+    const handleDragLeave = () => {
         setIsDraggedOver(false);
     }
 
@@ -32,9 +41,14 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
     }
 
     return <div
-        onDragEnter={() => { setIsDraggedOver(true) }}
-        onDragLeave={() => { setIsDraggedOver(false) }}
-        onDrop={droppedOn}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={(e:React.DragEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleDrop(timestamp);
+            setIsDraggedOver(false);
+        }}
         //ondragover prevent default needed for ondrop to work properly (?!)
         onDragOver={(e:React.DragEvent) => {
             e.stopPropagation();

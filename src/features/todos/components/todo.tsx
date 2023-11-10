@@ -6,14 +6,15 @@ import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/util
 
 interface Props {
     todo: ITodo,
+    calendarFieldHeight: number,
 }
 export enum resizeDirection {up, down};
 
-const Todo:React.FC<Props> = ({todo}, ) => {
-    const defaultHeight = 48;
+const Todo:React.FC<Props> = ({todo, calendarFieldHeight}) => {
+    
     const [currentPosYOffset, setCurrentPosYOffset] = useState<number>(0);
     const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart, todo.dateEnd));  
-    const {startDrag, stopDrag} = useDragDrop();
+    const {startDrag, stopDrag, currentlyDragged} = useDragDrop();
     const [pointerEvents, setPointerEvents] = useState<boolean>(true);
 
     useEffect(() => {
@@ -25,62 +26,19 @@ const Todo:React.FC<Props> = ({todo}, ) => {
         console.log(`height in pixels: ${calculateHeightInPixels(todo.dateStart, todo.dateEnd)}`);
     }, [todo.dateStart, todo.dateEnd, todo])
 
+    useEffect(() => {
+        if(currentlyDragged) setPointerEvents(false);
+        else setPointerEvents(true);
+    }, [currentlyDragged]);
+
     const dragStartHandler = (e:React.DragEvent) => {
         console.log('starting drag');
         startDrag(todo, dragActions.changeStartDate);
         e.dataTransfer.setDragImage(e.currentTarget, e.clientX - e.currentTarget.getBoundingClientRect().left, 0);
     };
 
-    let resizeStartMouseYPos = 0;
-    let resizeStartHeight = currentHeight;
     const startResizing = (e:React.MouseEvent, direction:resizeDirection) => {
-        e.preventDefault();
-        e.stopPropagation();
-        resizeStartMouseYPos = e.pageY;
-        resizeStartHeight = currentHeight;
-        setPointerEvents(false);
-        switch(direction){
-            case resizeDirection.up:
-                window.addEventListener('mousemove', handleResizingUp);
-                window.addEventListener('mouseup', stopResizingUp);
-                startDrag(todo, dragActions.changeStartDate);
-                break;
-            case resizeDirection.down:
-                window.addEventListener('mousemove', handleResizingDown);
-                window.addEventListener('mouseup', stopResizingDown);
-                startDrag(todo, dragActions.changeEndDate)
-                break;
-        }
-    }
-
-    const handleResizingUp = (e:MouseEvent) => {
-        const yDistanceMoved = (resizeStartMouseYPos - e.pageY)
-        setCurrentHeight(Math.max(defaultHeight, resizeStartHeight + yDistanceMoved));
-        setCurrentPosYOffset(-Math.max((defaultHeight - resizeStartHeight), yDistanceMoved));
-    }
-
-    const handleResizingDown = (e:MouseEvent) => {
-        const yDistanceMoved = (e.pageY - resizeStartMouseYPos)
-        setCurrentHeight(Math.max(defaultHeight, resizeStartHeight + yDistanceMoved));
-    }
-
-    const stopResizingUp = () => {
-        window.removeEventListener('mousemove', handleResizingUp);
-        window.removeEventListener('mouseup', stopResizingUp);
-        resizeStartMouseYPos = 0;
-        resizeStartHeight = 0;
-        stopDrag();
-        setPointerEvents(true);
-    }
-
-    const stopResizingDown = () => {
-        console.log('stop resizing down in todo');
-        window.removeEventListener('mousemove', handleResizingDown);
-        window.removeEventListener('mouseup', stopResizingDown);
-        resizeStartMouseYPos = 0;
-        resizeStartHeight = 0;
-        stopDrag();
-        setPointerEvents(true);
+        startDrag(todo, dragActions.changeEndDate);
     }
 
     const handleMouseClick = (e:React.MouseEvent) => {
@@ -89,7 +47,7 @@ const Todo:React.FC<Props> = ({todo}, ) => {
     }
 
     function calculateHeightInPixels(dateStart:number, dateEnd:number) {
-        return getTimeDiffInMinutes(dateStart, dateEnd) / calendarStepInMinutes * defaultHeight ;
+        return getTimeDiffInMinutes(dateStart, dateEnd) / calendarStepInMinutes * calendarFieldHeight ;
     }
 
     let style:React.CSSProperties = {

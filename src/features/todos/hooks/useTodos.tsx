@@ -53,30 +53,6 @@ const useTodos = () => {
         });
     }
 
-    const updateTodoStartDate = (todo: ITodo, newStartDate: number) => {
-        saveTodo({
-            ...todo,
-            dateStart: newStartDate,
-        });
-    }
-
-    const updateTodoEndDate = (todo: ITodo, newEndDate: number) => {
-        const endDate = new Date(newEndDate);
-        console.log(`changing end date from ${new Date(todo.dateEnd).toLocaleString()} to ${endDate.toLocaleString()}`);
-        saveTodo({
-            ...todo,
-            dateEnd: newEndDate,
-        });
-    }
-
-    const updateTodoDescription = (description: string) => {
-        if (editedTodo !== null) {
-            console.log('DESCRIPTION');
-            editedTodo.description = description;
-            saveTodo(editedTodo);
-        }
-    }
-
     const saveTodo = (todo?: ITodo) => {
         const todoToSave = todo ? todo : editedTodo;
         if (!todoToSave) return;
@@ -86,7 +62,7 @@ const useTodos = () => {
     }
 
 
-    return { getTodos, editedTodo, updateTodoDescription, updateTodoStartDate, updateTodoEndDate, newTodo, startEditingTodo, saveTodo, moveTodo, deleteTodo: (todo: ITodo) => { dispatch(deleteTodo(todo)); } }
+    return { getTodos, editedTodo, newTodo, startEditingTodo, saveTodo, moveTodo, deleteTodo: (todo: ITodo) => { dispatch(deleteTodo(todo)); } }
 }
 
 export default useTodos;

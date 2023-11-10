@@ -16,7 +16,7 @@ let lastTargetTimestamp: number | null;
 let listeners: React.Dispatch<React.SetStateAction<IDraggedd | null>>[] = [];
 
 const useDragDrop = () => {
-    const { updateTodoStartDate, updateTodoEndDate, moveTodo } = useTodos();
+    const { saveTodo, moveTodo } = useTodos();
     const setState = useState<IDraggedd | null>(currentlyDragged)[1];
     useEffect(() => {
         listeners.push(setState);
@@ -30,6 +30,7 @@ const useDragDrop = () => {
     }
 
     const startDrag = (todo: ITodo, action: dragActions) => {
+        console.log('use drag dragging ' + todo);
         currentlyDragged = { todo, action };
         notifyListeners();
     }
@@ -45,13 +46,13 @@ const useDragDrop = () => {
         }
         switch (currentlyDragged.action) {
             case dragActions.changeStartDate:
-                updateTodoStartDate(currentlyDragged.todo, lastTargetTimestamp);
+                saveTodo({...currentlyDragged.todo, dateStart: lastTargetTimestamp});
                 break;
             case dragActions.changeEndDate:
 /*              calendar fields are numbered at the top, so if the task is dropped between hour 00:00 and 00:15,
                 it will read time as 00:00. It works for creating task or setting start time, but if im trying 
                 to change the end date, i want the task stretching all the way to 00:15, so i add 15 minutes */
-                updateTodoEndDate(currentlyDragged.todo, addXStepsToTimestamp(lastTargetTimestamp, 1));
+                saveTodo({...currentlyDragged.todo, dateEnd: addXStepsToTimestamp(lastTargetTimestamp, 1)});
                 break;
         }
         cleanup();
