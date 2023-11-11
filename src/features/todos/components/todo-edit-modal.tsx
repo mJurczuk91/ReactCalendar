@@ -22,6 +22,7 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo }) => {
             }}>
                 <label htmlFor="task-description">Task Description: </label>
                 <input
+                    autoFocus
                     id="task-description"
                     type="text"
                     placeholder="description"
