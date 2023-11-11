@@ -3,13 +3,14 @@ import classes from './todo-droptarget.module.scss';
 import { ITodo } from '../store/todo-slice';
 import { ITodoDrag } from './todo';
 import { TodoDragActions } from './todo';
+import { addXStepsToTimestamp } from '../../calendar/utils/date-utils';
 
 interface Props {
     timestamp: number;
     createTodo: (timestamp:number) => void,
     saveTodo: (todo:ITodo) => void,
     moveTodo: (todo: ITodo, newStartDate:number) => void,
-    drag: {status:ITodoDrag|null, setDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>},
+    drag: {status:ITodoDrag|null, setTodoDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>},
     children?: React.ReactNode,
 }
 
@@ -18,7 +19,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children, saveTo
 
     const handleDragEnter = () => {
         setIsDraggedOver(true);
-        if(drag.status?.dragAction === TodoDragActions.resize) saveTodo({...drag.status.todo, dateEnd: timestamp});
+        if(drag.status?.dragAction === TodoDragActions.resize) saveTodo({...drag.status.todo, dateEnd: addXStepsToTimestamp(timestamp, 1)});
     }
 
     const handleDragLeave = () => {
@@ -34,7 +35,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children, saveTo
     const handleDrop = (e:React.DragEvent) => {
         setIsDraggedOver(false);
         if(drag.status?.dragAction === TodoDragActions.move) moveTodo(drag.status.todo, timestamp)
-        drag.setDragStatus(null);
+        drag.setTodoDragStatus(null);
     }
 
 

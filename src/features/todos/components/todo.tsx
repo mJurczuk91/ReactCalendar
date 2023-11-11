@@ -6,7 +6,7 @@ import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/util
 interface Props {
     todo: ITodo,
     calendarFieldHeight: number,
-    drag: {status:ITodoDrag|null, setDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>}
+    drag: {status:ITodoDrag|null, setTodoDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>}
 }
 
 export enum TodoDragActions {
@@ -26,12 +26,7 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
 
     useEffect(() => {
         setCurrentHeight(calculateHeightInPixels(todo.dateStart, todo.dateEnd));
-        const startDate = new Date(todo.dateStart);
-        const endDate =  new Date(todo.dateEnd);
-        console.log(`start date: ${startDate.toLocaleString()}`);
-        console.log(`end date: ${endDate.toLocaleString()}`);
-        console.log(`height in pixels: ${calculateHeightInPixels(todo.dateStart, todo.dateEnd)}`);
-    }, [todo.dateStart, todo.dateEnd, todo])
+    }, [todo, calculateHeightInPixels])
 
     useEffect(() => {
         if(drag.status) setPointerEvents(false);
@@ -39,12 +34,12 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
     }, [drag]);
 
     const handleDragStart = (e:React.DragEvent) => {
-        drag.setDragStatus({todo, dragAction: TodoDragActions.move});
+        drag.setTodoDragStatus({todo, dragAction: TodoDragActions.move});
         e.dataTransfer.setDragImage(e.currentTarget, e.clientX - e.currentTarget.getBoundingClientRect().left, 0);
     };
 
     const startResizing = (e:React.MouseEvent) => {
-        drag.setDragStatus({todo, dragAction: TodoDragActions.resize});
+        drag.setTodoDragStatus({todo, dragAction: TodoDragActions.resize});
     }
 
     const handleMouseClick = (e:React.MouseEvent) => {
@@ -74,6 +69,7 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
     onDragStart={handleDragStart}
     onClick={handleMouseClick}
     style={style}>
+        <div></div>
         {todo.description}
         <ResizeHandlebar handleStartResizing={startResizing}/>
     </div>

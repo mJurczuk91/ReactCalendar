@@ -14,7 +14,7 @@ const CalendarTimestampedNotesArea: React.FC<{ children?: React.ReactNode, inter
     const calendarFieldHeight = 48;
     const { getTodos, editedTodo, saveTodo, newTodo, moveTodo} = useTodos();
     const todos = getTodos();
-    const [dragStatus, setDragStatus] = useState<ITodoDrag|null>(null);
+    const [todoDragStatus, setTodoDragStatus] = useState<ITodoDrag|null>(null);
     console.log('calendar timestamped notes rerendered');
     return <>
         {editedTodo && createPortal(
@@ -29,11 +29,11 @@ const CalendarTimestampedNotesArea: React.FC<{ children?: React.ReactNode, inter
                         createTodo={newTodo}
                         saveTodo={saveTodo}
                         moveTodo={moveTodo}
-                        drag={{status: dragStatus, setDragStatus}}
+                        drag={{status: todoDragStatus, setTodoDragStatus}}
                         key={timestamp.getTime()}>
                         {todo &&
                             <Todo
-                                drag={{status: dragStatus, setDragStatus}}
+                                drag={{status: todoDragStatus, setTodoDragStatus}}
                                 calendarFieldHeight={calendarFieldHeight}
                                 todo={todo}
                                 key={`${todo.id}`}
