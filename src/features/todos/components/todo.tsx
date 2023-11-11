@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { ITodo } from "../store/todo-slice";
 import ResizeHandlebar from "./resize-handlebar";
-import { calendarStepInMinutes, getTimeDiffInMinutes } from "../../calendar/utils/date-utils";
+import { getTimeDiffInMinutes } from "../../calendar/utils/date-utils";
+import { calendarStepInMinutes } from "../../calendar/components/calendar-dashboard";
 
 interface Props {
     todo: ITodo,
@@ -75,7 +76,5 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
     </div>
     </>
 };
-
-
 
 export default Todo;
