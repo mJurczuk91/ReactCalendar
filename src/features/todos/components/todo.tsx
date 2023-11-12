@@ -7,7 +7,9 @@ import { calendarStepInMinutes } from "../../calendar/components/calendar-dashbo
 interface Props {
     todo: ITodo,
     calendarFieldHeight: number,
-    drag: {status:ITodoDrag|null, setTodoDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>}
+    todosInLine: number,
+    placeInLine: number,
+    drag: { status: ITodoDrag | null, setTodoDragStatus: React.Dispatch<React.SetStateAction<ITodoDrag | null>> }
 }
 
 export enum TodoDragActions {
@@ -15,14 +17,14 @@ export enum TodoDragActions {
     resize,
 }
 
-export interface ITodoDrag{
+export interface ITodoDrag {
     todo: ITodo,
     dragAction: TodoDragActions,
 }
 
-const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
+const Todo: React.FC<Props> = ({ todo, calendarFieldHeight, drag, todosInLine, placeInLine}) => {
 
-    const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart, todo.dateEnd));  
+    const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart, todo.dateEnd));
     const [pointerEvents, setPointerEvents] = useState<boolean>(true);
 
     useEffect(() => {
@@ -30,50 +32,51 @@ const Todo:React.FC<Props> = ({todo, calendarFieldHeight, drag}) => {
     }, [todo, calculateHeightInPixels])
 
     useEffect(() => {
-        if(drag.status) setPointerEvents(false);
+        if (drag.status) setPointerEvents(false);
         else setPointerEvents(true);
     }, [drag]);
 
-    const handleDragStart = (e:React.DragEvent) => {
-        drag.setTodoDragStatus({todo, dragAction: TodoDragActions.move});
+    const handleDragStart = (e: React.DragEvent) => {
+        drag.setTodoDragStatus({ todo, dragAction: TodoDragActions.move });
         e.dataTransfer.setDragImage(e.currentTarget, e.clientX - e.currentTarget.getBoundingClientRect().left, 0);
     };
 
-    const startResizing = (e:React.MouseEvent) => {
-        drag.setTodoDragStatus({todo, dragAction: TodoDragActions.resize});
+    const startResizing = (e: React.MouseEvent) => {
+        drag.setTodoDragStatus({ todo, dragAction: TodoDragActions.resize });
     }
 
-    const handleMouseClick = (e:React.MouseEvent) => {
+    const handleMouseClick = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
     }
 
-    function calculateHeightInPixels(dateStart:number, dateEnd:number) {
-        return getTimeDiffInMinutes(dateStart, dateEnd) / calendarStepInMinutes * calendarFieldHeight ;
+    function calculateHeightInPixels(dateStart: number, dateEnd: number) {
+        return getTimeDiffInMinutes(dateStart, dateEnd) / calendarStepInMinutes * calendarFieldHeight;
     }
 
-    let style:React.CSSProperties = {
+    let style: React.CSSProperties = {
         position: 'absolute',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         backgroundColor: 'red',
         minWidth: '95%',
-        height: currentHeight+`px`,
+        left: 100 / todosInLine * placeInLine +'%',
+        height: currentHeight + `px`,
         pointerEvents: pointerEvents ? 'all' : 'none',
-        zIndex: 2,
+        border: '1px solid white',
     };
 
     return <>
-    <div
-    draggable
-    onDragStart={handleDragStart}
-    onClick={handleMouseClick}
-    style={style}>
-        <div></div>
-        {todo.description}
-        <ResizeHandlebar handleStartResizing={startResizing}/>
-    </div>
+        <div
+            draggable
+            onDragStart={handleDragStart}
+            onClick={handleMouseClick}
+            style={style}>
+            <div></div>
+            {todo.description}
+            <ResizeHandlebar handleStartResizing={startResizing} />
+        </div>
     </>
 };
 
