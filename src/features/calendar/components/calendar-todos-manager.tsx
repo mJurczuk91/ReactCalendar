@@ -15,30 +15,37 @@ interface Props {
     intervalTimestamps: Date[],
 }
 
+type OutputGroup = {
+    indent: number,
+    todos: ITodo[],
+    startDate: number,
+    lastEndDate: number,
+}
+
 
 const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
+    console.log('rerender');
     const calendarFieldHeight = 48;
     const dispatch = useAppDispatch();
     const todoStore = useAppSelector(selectTodos);
-    const [editedTodo, setEditedTodo] = useState<ITodo|null>(null);
-    const [todoDragStatus, setTodoDragStatus] = useState<ITodoDrag|null>(null);
+    const [editedTodo, setEditedTodo] = useState<ITodo | null>(null);
+    const [todoDragStatus, setTodoDragStatus] = useState<ITodoDrag | null>(null);
     const todos = editedTodo ? todoStore.list.concat(editedTodo) : todoStore.list;
 
     const newTodo = (date: number) => {
         const newTodo = { id: todoStore.idCounter, dateStart: date, dateEnd: addXStepsToTimestamp(date, 1), description: '' }
-        dispatch(createTodo({ ...newTodo }));
         setEditedTodo({ ...newTodo })
     }
 
-    const saveTodo = (todo?: ITodo) => {
-        let todoToSave = todo ? todo : editedTodo;
-        if (!todoToSave) return;
-        if(todoToSave.dateEnd <= todoToSave.dateStart) todoToSave.dateEnd = addXStepsToTimestamp(todoToSave.dateStart, 1);
-        dispatch(updateTodo(todoToSave));
-        if(editedTodo) setEditedTodo(null);
+    const saveTodo = (todo: ITodo) => {
+        if (todo.dateEnd <= todo.dateStart) todo.dateEnd = addXStepsToTimestamp(todo.dateStart, 1);
+        if(todoStore.list.find((t) => t.id === todo.id)) dispatch(updateTodo(todo));
+        else dispatch(createTodo({...todo}))
+
+        if (editedTodo) setEditedTodo(null);
     }
 
-    const moveTodo = (todo: ITodo, newStartDate:number) => {
+    const moveTodo = (todo: ITodo, newStartDate: number) => {
         const todoLength = getTimeDiffInMinutes(todo.dateStart, todo.dateEnd);
         saveTodo({
             ...todo,
@@ -46,32 +53,80 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
             dateEnd: addXStepsToTimestamp(newStartDate, todoLength / calendarStepInMinutes),
         });
     }
-    
+
+    const prepareTodosForDisplay = () => {
+        let groups = groupTodos();
+        for(let group of groups){
+            for(let group2 of groups){
+                if(group.startDate < group2.startDate && group.startDate < group2.lastEndDate) group2.indent++;
+            }
+        }
+        return groups;
+    }
+
+    const groupTodos = () => {
+        let outputGroups:OutputGroup[] = [];
+        for(let todo of todos){
+            let group = outputGroups.find(group => group.startDate === todo.dateStart);
+            if(group){
+                group.todos.push(todo);
+                if(todo.dateEnd > group.lastEndDate) group.lastEndDate = todo.dateEnd;
+            } else {
+                let arr = [];
+                arr.push(todo);
+                outputGroups.push({
+                    indent: 0,
+                    todos: arr,
+                    startDate: todo.dateStart,
+                    lastEndDate: todo.dateEnd,
+                })
+            }
+        }
+        return outputGroups;
+    }
+
+    const todosToDisplay = prepareTodosForDisplay();
+
+
     return <>
         {editedTodo && createPortal(
             <TodoEditModal todo={editedTodo as ITodo} saveTodo={saveTodo} />,
             document.getElementById('modal') as Element)}
 
-            <div className={classes.container}>
-                {intervalTimestamps.map((timestamp) => {
-                    const todo = todos.find((todo) => todo.dateStart === timestamp.getTime());
-                    return <TodoDroptarget
-                        timestamp={timestamp.getTime()}
-                        createTodo={newTodo}
-                        saveTodo={saveTodo}
-                        moveTodo={moveTodo}
-                        drag={{status: todoDragStatus, setTodoDragStatus}}
-                        key={timestamp.getTime()}>
-                        {todo &&
-                            <Todo
-                                drag={{status: todoDragStatus, setTodoDragStatus}}
-                                calendarFieldHeight={calendarFieldHeight}
-                                todo={todo}
-                                key={`${todo.id}`}
-                            />}
-                    </TodoDroptarget>
-                })}
-            </div>
+        <div className={classes.container}>
+            {intervalTimestamps.map((timestamp) => {
+                const group = todosToDisplay.find((group) => group.startDate === timestamp.getTime());
+                return <TodoDroptarget
+                    timestamp={timestamp.getTime()}
+                    createTodo={newTodo}
+                    saveTodo={saveTodo}
+                    moveTodo={moveTodo}
+                    drag={{ status: todoDragStatus, setTodoDragStatus }}
+                    key={timestamp.getTime()}>
+                    {group &&
+                        <div
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                zIndex: group.indent,
+                                left: group.indent * 10 + '%',
+                            }}
+                        >
+                            {group.todos.map((todo, i) =>
+                                <Todo
+                                    todosInLine={group.todos.length}
+                                    placeInLine={i}
+                                    drag={{ status: todoDragStatus, setTodoDragStatus }}
+                                    calendarFieldHeight={calendarFieldHeight}
+                                    todo={todo}
+                                    key={`${todo.id}`}
+                                />)}
+                        </div>
+                    }
+                </TodoDroptarget>
+            })}
+        </div>
     </>
 }
 
