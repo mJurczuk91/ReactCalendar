@@ -1,21 +1,28 @@
 import { useState } from 'react';
 import classes from './todo-droptarget.module.scss';
-import useDragDrop from '../drag-drop/useDragDrop';
+import { ITodo } from '../store/todo-slice';
+import { ITodoDrag } from './todo';
+import { TodoDragActions } from './todo';
+import { addXStepsToTimestamp } from '../../calendar/utils/date-utils';
 
 interface Props {
     timestamp: number;
-    createTodo: (timestamp:number) => void;
-    children?: React.ReactNode;
+    createTodo: (timestamp:number) => void,
+    saveTodo: (todo:ITodo) => void,
+    moveTodo: (todo: ITodo, newStartDate:number) => void,
+    drag: {status:ITodoDrag|null, setTodoDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>},
+    children?: React.ReactNode,
 }
 
-const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
+const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children, saveTodo, moveTodo, drag}) => {
     const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
-    let {updateLastDraggedOver, handleDrop, currentlyDragged} = useDragDrop();
 
-    const droppedOn = (e:React.DragEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        handleDrop(timestamp);
+    const handleDragEnter = () => {
+        setIsDraggedOver(true);
+        if(drag.status?.dragAction === TodoDragActions.resize) saveTodo({...drag.status.todo, dateEnd: addXStepsToTimestamp(timestamp, 1)});
+    }
+
+    const handleDragLeave = () => {
         setIsDraggedOver(false);
     }
 
@@ -25,23 +32,23 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children}) => {
         createTodo(timestamp);
     }
 
-    const handleMouseOver = () => {
-        if(!currentlyDragged) return;
-        updateLastDraggedOver(timestamp);
-        console.log('last dragged over: '+new Date(timestamp).toLocaleString());
+    const handleDrop = (e:React.DragEvent) => {
+        setIsDraggedOver(false);
+        if(drag.status?.dragAction === TodoDragActions.move) moveTodo(drag.status.todo, timestamp)
+        drag.setTodoDragStatus(null);
     }
 
+
     return <div
-        onDragEnter={() => { setIsDraggedOver(true) }}
-        onDragLeave={() => { setIsDraggedOver(false) }}
-        onDrop={droppedOn}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         //ondragover prevent default needed for ondrop to work properly (?!)
         onDragOver={(e:React.DragEvent) => {
             e.stopPropagation();
             e.preventDefault();
         }}
         onClick={handleClick}
-        onMouseOver={handleMouseOver}
         className={`${classes.target} ${isDraggedOver ? classes.draggedOver : ''}`}
         >
 

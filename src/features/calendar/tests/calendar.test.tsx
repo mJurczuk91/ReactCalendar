@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { getMonthNameInPolish } from '../utils/date-utils';
 import datepickerSlice from '../../datepicker/store/datepicker.slice';
 import Calendar from '..';
-import { createIntervalTimestamps, calendarStepInMinutes } from "../utils/date-utils";
+import { createIntervalTimestamps } from "../utils/date-utils";
 
 describe('CALENDAR TESTS', () => {
     test("it renders a 15min interval hour list", () => { 

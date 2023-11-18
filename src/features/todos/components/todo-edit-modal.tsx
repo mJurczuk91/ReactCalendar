@@ -5,11 +5,11 @@ import { ITodo } from "../store/todo-slice";
 
 interface Props {
     todo: ITodo;
-    updateTodoDescription: (description:string) => void;
+    saveTodo: (todo: ITodo) => void;
 }
 
 
-const TodoEditModal: React.FC<Props> = ({ todo, updateTodoDescription }) => {
+const TodoEditModal: React.FC<Props> = ({ todo, saveTodo }) => {
     const [description, setDescription] = useState<string>(todo.description);
 
     return <>
@@ -18,10 +18,11 @@ const TodoEditModal: React.FC<Props> = ({ todo, updateTodoDescription }) => {
         onClick={(e:React.MouseEvent) => { e.stopPropagation() }}>
             <form onSubmit={(e: React.FormEvent) => {
                 e.preventDefault();
-                updateTodoDescription(description);
+                saveTodo({...todo, description: description});
             }}>
                 <label htmlFor="task-description">Task Description: </label>
                 <input
+                    autoFocus
                     id="task-description"
                     type="text"
                     placeholder="description"

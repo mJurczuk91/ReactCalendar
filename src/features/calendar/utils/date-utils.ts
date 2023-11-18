@@ -1,5 +1,4 @@
-
-export const calendarStepInMinutes = 15;
+import { calendarStepInMinutes } from "../components/calendar-dashboard";
 
 export const getLastDayOfMonth = (m: number, y: number):number => {
     m=m+1;
