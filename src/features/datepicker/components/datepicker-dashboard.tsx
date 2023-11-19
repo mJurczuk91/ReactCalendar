@@ -1,17 +1,18 @@
-import useSetDatepicker from "../hooks/useSetDatepicker";
 import { sameDayMonthYear, sameMonth } from "../../calendar/utils/date-utils";
 import classes from "./datepicker-dashboard.module.scss";
-import { useAppSelector } from "../../../store/redux-hooks";
-import { selectPickedDate } from "../store/datepicker.slice";
+import { IDateSlice, ISetDate } from "../store/datepicker.slice";
 
-const DatepickerDashboard: React.FC = () => {
-    const { setPickedDay } = useSetDatepicker();
-    const dates = useAppSelector(selectPickedDate);
+interface Props {
+    setSelectedDate: ({ day, month, year }: ISetDate) => void,
+    selectedDate: IDateSlice,
+}
+
+const DatepickerDashboard: React.FC<Props> = ({ setSelectedDate, selectedDate }) => {
     const today = new Date();
 
-    const buildWeeks = () => {
+    const buildCalendar = () => {
         const calendar = [];
-        const firstWeekStart = new Date(dates.viewYear, dates.viewMonth, 1);
+        const firstWeekStart = new Date(selectedDate.viewYear, selectedDate.viewMonth, 1);
         while (firstWeekStart.getDay() > 1) {
             firstWeekStart.setDate(firstWeekStart.getDate() - 1);
         }
@@ -21,7 +22,7 @@ const DatepickerDashboard: React.FC = () => {
             const month = date.getMonth();
             const year = date.getFullYear();
             return () => {
-                setPickedDay({ day, month, year });
+                setSelectedDate({ day, month, year });
             }
         }
 
@@ -36,12 +37,12 @@ const DatepickerDashboard: React.FC = () => {
                         key={incrementingDay.getTime()}
                         className={
                             sameDayMonthYear(currentDay, today) ? classes.today :
-                            sameDayMonthYear(currentDay, new Date(dates.pickedYear, dates.pickedMonth, dates.pickedDay)) ? classes.pickedDay :
-                            sameMonth(currentDay, new Date(dates.viewYear, dates.viewMonth, 10)) ? classes.currentMonth : ''
-                    }
+                                sameDayMonthYear(currentDay, new Date(selectedDate.pickedYear, selectedDate.pickedMonth, selectedDate.pickedDay)) ? classes.pickedDay :
+                                    sameMonth(currentDay, new Date(selectedDate.viewYear, selectedDate.viewMonth, 10)) ? classes.currentMonth : ''
+                        }
                         onClick={dayClickHandler(currentDay)}
-                    >      
-                    {incrementingDay.getDate()}           
+                    >
+                        {incrementingDay.getDate()}
                     </div>
                 );
                 weekDay++;
@@ -55,7 +56,7 @@ const DatepickerDashboard: React.FC = () => {
     return <>
         <div className={classes.container}>
             <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>Sb</div><div>Nd</div>
-            {buildWeeks()}
+            {buildCalendar()}
         </div>
     </>
 }

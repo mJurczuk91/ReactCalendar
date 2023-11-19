@@ -1,10 +1,9 @@
-import useSetDatepicker from '../hooks/useSetDatepicker';
 import { getMonthNameInPolish } from '../../calendar/utils/date-utils';
-import { useAppSelector } from '../../../store/redux-hooks';
-import { selectPickedDate } from '../store/datepicker.slice';
+import { useAppDispatch, useAppSelector } from '../../../store/redux-hooks';
+import { selectPickedDate, setNextViewMonth, setPreviousViewMonth } from '../store/datepicker.slice';
 
 const DatepickerNavbar: React.FC = () => {
-    const { viewPreviousMonth, viewNextMonth } = useSetDatepicker();
+    const dispatch = useAppDispatch();
     const {viewMonth, viewYear} = useAppSelector(selectPickedDate);
     return (
         <div>
@@ -15,8 +14,8 @@ const DatepickerNavbar: React.FC = () => {
                 {viewYear}
             </p>
             <div>
-                <button onClick={() => { viewPreviousMonth(); }}>{`<`}</button>
-                <button onClick={() => { viewNextMonth(); }}>{`>`}</button>
+                <button onClick={() => { dispatch(setPreviousViewMonth()) }}>{`<`}</button>
+                <button onClick={() => { dispatch(setNextViewMonth()) }}>{`>`}</button>
             </div>
         </div>
     )
