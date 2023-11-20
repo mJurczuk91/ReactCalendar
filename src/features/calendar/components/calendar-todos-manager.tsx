@@ -89,7 +89,11 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
 
     return <>
         {editedTodo && createPortal(
-            <TodoEditModal todo={editedTodo as ITodo} saveTodo={saveTodo} />,
+            <TodoEditModal 
+                todo={editedTodo}
+                saveTodo={saveTodo}
+                updateEditedTodo={setEditedTodo}
+            />,
             document.getElementById('modal') as Element)}
 
         <div className={classes.container}>
