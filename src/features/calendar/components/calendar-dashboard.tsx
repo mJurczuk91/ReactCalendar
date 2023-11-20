@@ -10,14 +10,14 @@ import classes from "./calendar-dashboard.module.scss";
 export const calendarStepInMinutes = 15;
 
 const CalendarDashboard: React.FC = () => {
-    const { pickedDay, pickedMonth, pickedYear } = useAppSelector(selectPickedDate);
-    const intervalTimestamps = createIntervalTimestamps(new Date(pickedYear, pickedMonth, pickedDay));
+    const { day, month, year } = useAppSelector(selectPickedDate);
+    const intervalTimestamps = createIntervalTimestamps(new Date(year, month, day));
     
     return <div className={classes.container}>
         <CalendarTopbar
-            pickedDay={pickedDay}
-            pickedMonth={pickedMonth}
-            pickedYear={pickedYear} />
+            pickedDay={day}
+            pickedMonth={month}
+            pickedYear={year} />
         <div className={classes.notesarea}>
             <CalendarHourlist intervalTimestamps={intervalTimestamps} />
             <CalendarTodosManager

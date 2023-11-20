@@ -1,4 +1,4 @@
-import { setDate, setNextViewMonth, setPreviousViewMonth } from "../store/datepicker.slice";
+/* import { setDate, setNextViewMonth, setPreviousViewMonth } from "../store/datepicker.slice";
 import { useAppDispatch } from "../../../store/redux-hooks";
 import { ISetDate } from "../store/datepicker.slice";
 
@@ -15,3 +15,5 @@ const useSetDatepicker = () => {
 
 export default useSetDatepicker;
 
+ */
+export default {}

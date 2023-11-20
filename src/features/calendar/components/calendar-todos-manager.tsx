@@ -24,7 +24,6 @@ type OutputGroup = {
 
 
 const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
-    console.log('rerender');
     const calendarFieldHeight = 48;
     const dispatch = useAppDispatch();
     const todoStore = useAppSelector(selectTodos);
