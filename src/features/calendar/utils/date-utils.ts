@@ -22,12 +22,6 @@ export const sameDayMonthYear = (date1:Date, date2:Date):boolean => {
     return true;
 }
 
-export const sameMonth = (date1:Date, date2:Date):boolean => {
-    if(date1.getMonth() !== date2.getMonth()) return false;
-
-    return true;
-}
-
 export const getMonthNameInPolish = (month:number):string => {
     switch (month){
         case 0:{

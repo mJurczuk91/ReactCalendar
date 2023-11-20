@@ -1,4 +1,4 @@
-import { sameDayMonthYear, sameMonth } from "../../calendar/utils/date-utils";
+import { sameDayMonthYear } from "../../calendar/utils/date-utils";
 import classes from "./datepicker-dashboard.module.scss";
 import { IDateSlice } from "../store/datepicker.slice";
 
@@ -15,6 +15,7 @@ const DatepickerDashboard: React.FC<Props> = ({ setSelectedDate, selectedDate, v
     const today = new Date();
 
     const buildCalendar = () => {
+        console.log(`viewmonth: ${viewMonth}, `);
         const calendar = [];
         const firstWeekStart = new Date(viewYear, viewMonth, 1);
         while (firstWeekStart.getDay() > 1) {
@@ -25,10 +26,10 @@ const DatepickerDashboard: React.FC<Props> = ({ setSelectedDate, selectedDate, v
             const day = date.getDate();
             const month = date.getMonth();
             const year = date.getFullYear();
-            if(month !== viewMonth) {
+            if (month !== viewMonth) {
                 setViewMonth(month);
             };
-            if(year !== viewYear) setViewYear(year);
+            if (year !== viewYear) setViewYear(year);
             setSelectedDate({ day, month, year });
         }
 
@@ -44,7 +45,7 @@ const DatepickerDashboard: React.FC<Props> = ({ setSelectedDate, selectedDate, v
                         className={
                             sameDayMonthYear(currentDay, today) ? classes.today :
                                 sameDayMonthYear(currentDay, new Date(selectedDate.year, selectedDate.month, selectedDate.day)) ? classes.pickedDay :
-                                    sameMonth(currentDay, new Date(selectedDate.year, selectedDate.month, 10)) ? classes.currentMonth : ''
+                                    viewMonth === currentDay.getMonth() ? classes.currentMonth : ''
                         }
                         onClick={() => {
                             dayClickHandler(currentDay)
