@@ -25,9 +25,11 @@ const DatepickerDashboard: React.FC<Props> = ({ setSelectedDate, selectedDate, v
             const day = date.getDate();
             const month = date.getMonth();
             const year = date.getFullYear();
-            setSelectedDate({ day, month, year });
-            if(month !== viewMonth) setViewMonth(month);
+            if(month !== viewMonth) {
+                setViewMonth(month);
+            };
             if(year !== viewYear) setViewYear(year);
+            setSelectedDate({ day, month, year });
         }
 
         const incrementingDay = new Date(firstWeekStart);

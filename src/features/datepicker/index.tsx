@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "../../store/redux-hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatepickerDashboard from "./components/datepicker-dashboard";
 import DatepickerNavbar from "./components/datepicker-navbar";
 import { IDateSlice, selectPickedDate, setDate } from "./store/datepicker.slice";
@@ -10,8 +10,16 @@ interface Props {
 }
 
 const Datepicker: React.FC<Props> = ({ setSelectedDate, selectedDate }) => {
-    const [viewMonth, setViewMonth] = useState<number>(new Date().getMonth());
-    const [viewYear, setViewYear] = useState<number>(new Date().getFullYear());
+    const globalSelectedDate = useAppSelector(selectPickedDate);
+    const [viewMonth, setViewMonth] = useState<number>( selectedDate ? selectedDate.month : globalSelectedDate.month);
+    const [viewYear, setViewYear] = useState<number>( selectedDate ? selectedDate.year : globalSelectedDate.year);
+    
+    useEffect(() => {
+        if(!selectedDate) {
+            setViewMonth(globalSelectedDate.month);
+            setViewYear(globalSelectedDate.year);
+        }
+    },[globalSelectedDate, selectedDate])
 
     const dispatch = useAppDispatch();
 
@@ -19,7 +27,7 @@ const Datepicker: React.FC<Props> = ({ setSelectedDate, selectedDate }) => {
         dispatch(setDate({ day, month, year }));
     };
 
-    const globalSelectedDate = useAppSelector(selectPickedDate);
+    
 
     return <div>
         <DatepickerNavbar

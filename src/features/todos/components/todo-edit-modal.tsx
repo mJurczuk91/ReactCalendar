@@ -22,23 +22,18 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
     const [description, setDescription] = useState<string>(todo.description);
     const [displayDatepicker, setDisplayDatepicker] = useState<boolean>(false);
     const dispatch = useAppDispatch();
-    const [startDate, setStartdDate] = useState<IDateSlice>({
-        day: new Date(todo.dateStart).getDate(),
-        month: new Date(todo.dateStart).getMonth(),
-        year: new Date(todo.dateStart).getFullYear(),
-    })
 
     const handleStartDateClicked = (e: React.MouseEvent) => {
-        if(!displayDatepicker) setDisplayDatepicker(true);
+        if (!displayDatepicker) setDisplayDatepicker(true);
         else setDisplayDatepicker(false);
     }
 
-    const changeTodoStartDate = ({day, month, year}:IDateSlice) => {
+    const changeTodoStartDate = ({ day, month, year }: IDateSlice) => {
         const newStartDate = new Date(todo.dateStart);
         newStartDate.setFullYear(year, month, day);
 
         updateEditedTodo({
-            ...todo, 
+            ...todo,
             dateStart: newStartDate.getTime(),
             dateEnd: addXStepsToTimestamp(
                 newStartDate.getTime(),
@@ -46,17 +41,13 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
             ),
         });
 
-        const newStartDateSlice:IDateSlice = {
+        //change global display date
+        dispatch(setDate({
             day: newStartDate.getDate(),
             month: newStartDate.getMonth(),
             year: newStartDate.getFullYear(),
-        }
-
-        //czemu zmiana propsów nie rerenderuje
-        setStartdDate(newStartDateSlice)
-
-        //change global display date
-        dispatch(setDate(newStartDateSlice));
+        }));
+        
         setDisplayDatepicker(false);
     }
 
@@ -69,7 +60,7 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
                     <span
                         onClick={handleStartDateClicked}
                     >
-                        {startDate.day} {getMonthNameInPolish(startDate.month)}
+                        {new Date(todo.dateStart).getDate()} {getMonthNameInPolish(new Date(todo.dateStart).getMonth())}
                     </span>
                     <span>{padWithZeros(new Date(todo.dateStart).getHours())}:{padWithZeros(new Date(todo.dateStart).getMinutes())}</span>
                     <span> - </span>
@@ -77,7 +68,13 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
                 </p>
                 {displayDatepicker &&
                     <div>
-                        <Datepicker selectedDate={startDate} setSelectedDate={changeTodoStartDate} />
+                        <Datepicker selectedDate={
+                            {
+                                day: new Date(todo.dateStart).getDate(),
+                                month: new Date(todo.dateStart).getMonth(),
+                                year: new Date(todo.dateStart).getFullYear(),
+                            }
+                        } setSelectedDate={changeTodoStartDate} />
                     </div>
                 }
             </div>
