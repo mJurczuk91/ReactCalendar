@@ -22,9 +22,6 @@ const DatepickerSlice = createSlice({
             state.day = day;
             state.month = month;
             state.year = year;
-
-/*             if(state.viewMonth !== month) state.viewMonth = month;
-            if(state.viewYear !== year) state.viewYear = year; */
         },
     }
 });
