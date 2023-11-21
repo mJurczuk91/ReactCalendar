@@ -8,7 +8,7 @@ import { padWithZeros } from "../../calendar/utils/date-utils";
 import { useAppDispatch } from "../../../store/redux-hooks";
 import { calendarStepInMinutes } from "../../calendar/components/calendar-dashboard";
 import { setDate } from "../../datepicker/store/datepicker.slice";
-import { useFormik } from "formik";
+import { FormikErrors, FormikValues, useFormik } from "formik";
 
 
 interface Props {
@@ -47,27 +47,42 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
             month: newStartDate.getMonth(),
             year: newStartDate.getFullYear(),
         }));
-        
+
         setDisplayDatepicker(false);
     }
+
+    const formik = useFormik({
+        initialValues: {
+            description: '',
+        },
+        validate: values => {
+            const errors:FormikErrors<FormikValues> = {};
+            if(!values.description) errors.description = 'Description required';
+            return errors;
+        },
+        onSubmit: values => {
+            saveTodo({...todo, description: values.description});
+        }
+    });
 
     return <>
         <div
             className={classes.modal}
             onClick={(e: React.MouseEvent) => { e.stopPropagation() }}>
-            <div>
+            <div className={classes.datepicker__menu}>
+                <p
+                    className={classes.datepicker__toggle}
+                    onClick={handleStartDateClicked}
+                >
+                    {new Date(todo.dateStart).getDate()} {getMonthNameInPolish(new Date(todo.dateStart).getMonth())}
+                </p>
                 <p>
-                    <span
-                        onClick={handleStartDateClicked}
-                    >
-                        {new Date(todo.dateStart).getDate()} {getMonthNameInPolish(new Date(todo.dateStart).getMonth())}
-                    </span>
-                    <span>{padWithZeros(new Date(todo.dateStart).getHours())}:{padWithZeros(new Date(todo.dateStart).getMinutes())}</span>
+                    <span className={classes.datepicker__toggle}>{padWithZeros(new Date(todo.dateStart).getHours())}:{padWithZeros(new Date(todo.dateStart).getMinutes())}</span>
                     <span> - </span>
                     <span>{padWithZeros(new Date(todo.dateEnd).getHours())}:{padWithZeros(new Date(todo.dateEnd).getMinutes())}</span>
                 </p>
                 {displayDatepicker &&
-                    <div>
+                    <div className={classes.datepicker}>
                         <Datepicker selectedDate={
                             {
                                 day: new Date(todo.dateStart).getDate(),
@@ -78,21 +93,23 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
                     </div>
                 }
             </div>
-            <form onSubmit={(e: React.FormEvent) => {
-                e.preventDefault();
-                saveTodo({ ...todo, description: description });
-            }}>
-                <div>
-                    <label htmlFor="task-description">Task Description: </label>
+            <form onSubmit={formik.handleSubmit}>
+                <div className={classes.input__container}>
                     <input
+                        className={classes.description__input}
                         autoFocus
-                        id="task-description"
+                        id="description"
                         type="text"
                         placeholder="description"
-                        onChange={(e) => { setDescription(e.currentTarget.value); }}
+                        {...formik.getFieldProps('description')}
                     />
                 </div>
-                <button type="submit">Save</button>
+                <div className={classes.input__error}>
+                    {formik.errors.description && formik.errors.description}
+                </div>
+                <div className={classes.button__container}>
+                    <button className={classes.button__save} type="submit">Save</button>
+                </div>
             </form>
         </div>
     </>
