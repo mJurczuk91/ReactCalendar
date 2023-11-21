@@ -4,12 +4,16 @@ input {
     all: unset;
 }
 
+button {
+    all: unset;
+}
+
 .modal {
     z-index: 99;
     padding: 15px 0;
     height: auto;
     width: 300px;
-    background-color:#fff;
+    background-color: #fff;
     position: fixed;
     top: 30%;
     left: 50%;
@@ -18,42 +22,66 @@ input {
     box-shadow: 0px 0px 35px -16px rgba(66, 68, 90, 1);
 }
 
-.datepicker{
+.datepicker {
     position: absolute;
     top: +50px;
     background-color: white;
-    border:1px solid rgba(66, 68, 90);
-    -webkit-animation: fadein 0.3s; /* Safari, Chrome and Opera > 12.1 */
-    -moz-animation: fadein 0.3s; /* Firefox < 16 */
-     -ms-animation: fadein 0.3s; /* Internet Explorer */
-      -o-animation: fadein 0.3s; /* Opera < 12.1 */
-         animation: fadein 0.3s;
+    border: 1px solid rgba(66, 68, 90);
+    -webkit-animation: fadein 0.3s;
+    /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 0.3s;
+    /* Firefox < 16 */
+    -ms-animation: fadein 0.3s;
+    /* Internet Explorer */
+    -o-animation: fadein 0.3s;
+    /* Opera < 12.1 */
+    animation: fadein 0.3s;
 }
 
 @keyframes fadein {
- from { opacity: 0; }
- to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Firefox < 16 */
 @-moz-keyframes fadein {
- from { opacity: 0; }
- to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Safari, Chrome and Opera > 12.1 */
 @-webkit-keyframes fadein {
- from { opacity: 0; }
- to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Internet Explorer */
 @-ms-keyframes fadein {
- from { opacity: 0; }
- to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
-.datepicker__menu{
+.datepicker__menu {
     display: flex;
     justify-content: space-between;
     margin: $margin-default;
@@ -67,20 +95,20 @@ p {
     -webkit-user-select: none;
 }
 
-.datepicker__toggle{
-  --border-color: rgb(56, 56, 56);
-  --border-width: 5px;
-  --bottom-distance: -4px;
-  
-  color: #272727;
-  background-image: linear-gradient(var(--border-color), var(--border-color));
-  background-size: 0% var(--border-width);
-  background-repeat: no-repeat;
-  transition: background-size 0.3s;
-  background-position: 50% calc(100% - var(--bottom-distance));
+.datepicker__toggle {
+    --border-color: rgb(56, 56, 56);
+    --border-width: 5px;
+    --bottom-distance: -4px;
+
+    color: #272727;
+    background-image: linear-gradient(var(--border-color), var(--border-color));
+    background-size: 0% var(--border-width);
+    background-repeat: no-repeat;
+    transition: background-size 0.3s;
+    background-position: 50% calc(100% - var(--bottom-distance));
 }
 
-.datepicker__toggle:hover{
+.datepicker__toggle:hover {
     cursor: pointer;
     background-size: 100% var(--border-width);
 }
@@ -91,7 +119,7 @@ p {
     --border-color: rgb(26, 115, 232);
     --border-width: 2px;
     --bottom-distance: 0px;
-    
+
     color: #272727;
     background-image: linear-gradient(var(--border-color), var(--border-color));
     background-size: 0% var(--border-width);
@@ -104,7 +132,7 @@ p {
     background-size: 100% var(--border-width);
 }
 
-.input__container{
+.input__container {
     display: flex;
     margin: $margin-default;
 }
@@ -119,20 +147,113 @@ p {
     width: 100px;
     height: 40px;
     margin-top: 10px;
+    border-radius: 4px;
+    text-align: center;
     border: none;
     font-size: medium;
     color: white;
-    background-color: rgb(26,115,232);
+    background-color: rgb(26, 115, 232);
 }
 
-.button__save:hover{
+.button__save:hover {
     cursor: pointer;
     background-color: rgb(26, 100, 197);
 }
 
-.input__error{
+.input__error {
     height: 20px;
     margin: $margin-default;
     font-size: small;
     color: red;
+}
+
+.modal__topbar {
+    display: flex;
+    justify-content: right;
+}
+
+.modal__offswitch {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 25px;
+    margin: 0 30px 0 0;
+    border: none;
+}
+
+.modal__offswitch:hover {
+    -webkit-animation: bump 0.3s;
+    /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: bump 0.3s;
+    /* Firefox < 16 */
+    -ms-animation: bump 0.3s;
+    /* Internet Explorer */
+    -o-animation: bump 0.3s;
+    /* Opera < 12.1 */
+    animation: bump 0.3s;
+    transform: scale(1.25);
+}
+
+/* @-webkit-keyframes bump {
+    0% {
+        animation-timing-function: ease-in;
+        transform: scale(1);
+    }
+    50% {
+        animation-timing-function: ease-in;
+        transform: scale(1.25);
+    }
+    100% {
+        animation-timing-function: ease-in;
+        transform: scale(1);
+    }
+} */
+
+@-webkit-keyframes bump {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.25);
+    }
+}
+
+
+
+@keyframes bump {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.25);
+    }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes bump {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.25);
+    }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes bump {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.25);
+    }
+}
+
+/* Internet Explorer */
+@-ms-keyframes bump {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.25);
+    }
 }

@@ -15,15 +15,15 @@ interface Props {
     todo: ITodo;
     saveTodo: (todo: ITodo) => void;
     updateEditedTodo: React.Dispatch<React.SetStateAction<ITodo | null>>,
+    cancelEditingTodo: () => void,
 }
 
 
-const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) => {
-    const [description, setDescription] = useState<string>(todo.description);
+const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo, cancelEditingTodo }) => {
     const [displayDatepicker, setDisplayDatepicker] = useState<boolean>(false);
     const dispatch = useAppDispatch();
 
-    const handleStartDateClicked = (e: React.MouseEvent) => {
+    const toggleDisplayDatepicker = (e: React.MouseEvent) => {
         if (!displayDatepicker) setDisplayDatepicker(true);
         else setDisplayDatepicker(false);
     }
@@ -56,23 +56,39 @@ const TodoEditModal: React.FC<Props> = ({ todo, saveTodo, updateEditedTodo }) =>
             description: '',
         },
         validate: values => {
-            const errors:FormikErrors<FormikValues> = {};
-            if(!values.description) errors.description = 'Description required';
-            return errors;
+            return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
+                const errors: FormikErrors<FormikValues> = {};
+                if (!values.description) errors.description = 'Description required';
+                return errors;
+            }
+            )
         },
         onSubmit: values => {
-            saveTodo({...todo, description: values.description});
+            saveTodo({ ...todo, description: values.description });
         }
     });
 
     return <>
         <div
             className={classes.modal}
-            onClick={(e: React.MouseEvent) => { e.stopPropagation() }}>
+            onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                if(displayDatepicker) setDisplayDatepicker(false);
+            }}
+            onKeyDown={(e: React.KeyboardEvent) => {
+                if(e.key === 'Escape') {
+                    e.stopPropagation();
+                    cancelEditingTodo();
+                }
+            }}
+            >
+            <div className={classes.modal__topbar}>
+                <button className={classes.modal__offswitch} onClick={cancelEditingTodo}>&times;</button>
+            </div>
             <div className={classes.datepicker__menu}>
                 <p
                     className={classes.datepicker__toggle}
-                    onClick={handleStartDateClicked}
+                    onClick={toggleDisplayDatepicker}
                 >
                     {new Date(todo.dateStart).getDate()} {getMonthNameInPolish(new Date(todo.dateStart).getMonth())}
                 </p>

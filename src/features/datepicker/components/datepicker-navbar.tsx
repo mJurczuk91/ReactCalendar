@@ -33,8 +33,16 @@ const DatepickerNavbar: React.FC<Props> = ({viewMonth, viewYear, setViewMonth, s
                 {viewYear}
             </p>
             <div>
-                <button onClick={viewPreviousMonth}>{`<`}</button>
-                <button onClick={viewNextMonth}>{`>`}</button>
+                <button onClick={(e:React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    viewPreviousMonth();
+                }}>{`<`}</button>
+                <button onClick={(e:React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    viewNextMonth();
+                }}>{`>`}</button>
             </div>
         </div>
     )
