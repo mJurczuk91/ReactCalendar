@@ -1,11 +1,29 @@
-import useSetDatepicker from '../hooks/useSetDatepicker';
 import { getMonthNameInPolish } from '../../calendar/utils/date-utils';
-import { useAppSelector } from '../../../store/redux-hooks';
-import { selectPickedDate } from '../store/datepicker.slice';
 
-const DatepickerNavbar: React.FC = () => {
-    const { viewPreviousMonth, viewNextMonth } = useSetDatepicker();
-    const {viewMonth, viewYear} = useAppSelector(selectPickedDate);
+interface Props {
+    setViewMonth: React.Dispatch<React.SetStateAction<number>>,
+    setViewYear: React.Dispatch<React.SetStateAction<number>>,
+    viewMonth: number,
+    viewYear: number,
+}
+
+const DatepickerNavbar: React.FC<Props> = ({viewMonth, viewYear, setViewMonth, setViewYear}) => {
+    const viewNextMonth = () => {
+        if (viewMonth === 11) {
+            setViewMonth(0);
+            setViewYear(viewYear + 1)
+        } else {
+            setViewMonth(viewMonth + 1);
+        }
+    }
+    const viewPreviousMonth = () => {
+        if (viewMonth === 0) {
+            setViewMonth(11);
+            setViewYear(viewYear - 1)
+        } else {
+            setViewMonth(viewMonth - 1);
+        }
+    }
     return (
         <div>
             <p>
@@ -15,8 +33,16 @@ const DatepickerNavbar: React.FC = () => {
                 {viewYear}
             </p>
             <div>
-                <button onClick={() => { viewPreviousMonth(); }}>{`<`}</button>
-                <button onClick={() => { viewNextMonth(); }}>{`>`}</button>
+                <button onClick={(e:React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    viewPreviousMonth();
+                }}>{`<`}</button>
+                <button onClick={(e:React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    viewNextMonth();
+                }}>{`>`}</button>
             </div>
         </div>
     )

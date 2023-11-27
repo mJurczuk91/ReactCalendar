@@ -24,17 +24,27 @@ type OutputGroup = {
 
 
 const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
-    console.log('rerender');
     const calendarFieldHeight = 48;
     const dispatch = useAppDispatch();
     const todoStore = useAppSelector(selectTodos);
     const [editedTodo, setEditedTodo] = useState<ITodo | null>(null);
+    const [showModal, setShowModal] = useState<boolean>(false);
     const [todoDragStatus, setTodoDragStatus] = useState<ITodoDrag | null>(null);
     const todos = editedTodo ? todoStore.list.concat(editedTodo) : todoStore.list;
 
     const newTodo = (date: number) => {
         const newTodo = { id: todoStore.idCounter, dateStart: date, dateEnd: addXStepsToTimestamp(date, 1), description: '' }
-        setEditedTodo({ ...newTodo })
+        startEditingTodo(newTodo);
+    }
+
+    const startEditingTodo = (todo:ITodo) => {
+        setEditedTodo(todo);
+        setShowModal(true);
+    }
+
+    const cancelEditingTodo = () => {
+        setEditedTodo(null);
+        setShowModal(false);
     }
 
     const saveTodo = (todo: ITodo) => {
@@ -89,8 +99,13 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
 
 
     return <>
-        {editedTodo && createPortal(
-            <TodoEditModal todo={editedTodo as ITodo} saveTodo={saveTodo} />,
+        {editedTodo && showModal && createPortal(
+            <TodoEditModal 
+                todo={editedTodo}
+                saveTodo={saveTodo}
+                updateEditedTodo={setEditedTodo}
+                cancelEditingTodo={cancelEditingTodo}
+            />,
             document.getElementById('modal') as Element)}
 
         <div className={classes.container}>
@@ -109,7 +124,7 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
                                 position: 'absolute',
                                 width: '100%',
                                 height: '100%',
-                                zIndex: group.indent,
+                                zIndex: group.indent + 1,
                                 left: group.indent * 10 + '%',
                             }}
                         >
