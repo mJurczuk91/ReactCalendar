@@ -71,10 +71,14 @@ export const padWithZeros = (a:number) => {
     else return a;
 };
 
-export const createIntervalTimestamps = (pickedDate: Date): Date[] => {
+export const createIntervalTimestamps = (pickedDate: Date, startTime?: Date): Date[] => {
     let hours = [];
     let date = new Date(pickedDate);
-    date.setHours(0, 0, 0);
+
+    if(startTime) {
+        date.setHours(startTime.getHours());
+        date.setMinutes(startTime.getMinutes());
+    } else date.setHours(0, 0, 0);
     while (date.getDate() === pickedDate.getDate()) {
         hours.push(new Date(date));
         date = new Date(date.getTime() + calendarStepInMinutes * 60000);

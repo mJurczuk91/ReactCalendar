@@ -1,18 +1,16 @@
-import Datepicker from "../../../datepicker";
+import Datepicker from "../../../../datepicker";
 import { useState } from "react";
-import { IDateSlice, selectPickedDate } from "../../../datepicker/store/datepicker.slice";
-import { useAppDispatch, useAppSelector } from "../../../../store/redux-hooks";
-import { setDate } from "../../../datepicker/store/datepicker.slice";
+import { IDateSlice, selectPickedDate } from "../../../../datepicker/store/datepicker.slice";
+import { useAppDispatch, useAppSelector } from "../../../../../store/redux-hooks";
+import { setDate } from "../../../../datepicker/store/datepicker.slice";
 import { useContext } from "react";
-import { ITodo } from "../../store/todo-slice";
-import { EditedTodoContext, EditedTodoContextType } from "../../../calendar/components/calendar-todos-manager";
+import { EditedTodoContext } from "../../../../calendar/components/calendar-todos-manager";
+import { changeTodoStartDateKeepDuration } from "../../../store/todo-slice";
+import { getMonthNameInPolish } from "../../../../calendar/utils/date-utils";
 
-interface Props {
-    updateEditedTodoStartDate: (newStartDate:Date)=>void,
-}
 
-const DateInput: React.FC<Props> = ({ updateEditedTodoStartDate }) => {
-    const {editedTodo, updateEditedTodo} = useContext(EditedTodoContext) as EditedTodoContextType
+const DateInput: React.FC = () => {
+    const {editedTodo, updateEditedTodo} = useContext(EditedTodoContext);
     const dispatch = useAppDispatch();
 
     const { day: globalDay, month: globalMonth, year: globalYear } = useAppSelector(selectPickedDate);
@@ -34,7 +32,9 @@ const DateInput: React.FC<Props> = ({ updateEditedTodoStartDate }) => {
         if (day !== globalDay || month !== globalMonth || year !== globalYear) dispatch(setDate({ day, month, year }));
 
         setDisplayDatepicker(false);
-        updateEditedTodoStartDate(newDate);
+        updateEditedTodo(
+            changeTodoStartDateKeepDuration(editedTodo, newDate)
+        );
     }
 
     return <div style={{display:'flex'}}>
@@ -42,17 +42,20 @@ const DateInput: React.FC<Props> = ({ updateEditedTodoStartDate }) => {
             Start date:
             <input
                 type="text"
-                {...field}
+                value={`${editedTodo.dateStart.getDate()} ${getMonthNameInPolish(editedTodo.dateStart.getMonth())}`}
+                readOnly={true}
+                onFocus={() => {
+                    setDisplayDatepicker(true)
+                }}
             />
-            {meta.error && meta.touched && <div>{meta.error}</div>}
         </label>
         {displayDatepicker &&
             <div style={{position: 'absolute', background: 'white', top: '80px'}}>
                 <Datepicker
                     selectedDate={{
-                        day: value.getDate(),
-                        month: value.getMonth(),
-                        year: value.getFullYear(),
+                        day: editedTodo.dateStart.getDate(),
+                        month: editedTodo.dateStart.getMonth(),
+                        year: editedTodo.dateStart.getFullYear(),
                     }}
                     setSelectedDate={setStartDate}
                 />

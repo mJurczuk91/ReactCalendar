@@ -4,11 +4,12 @@ import Todo from "../../todos/components/todo";
 import { ITodo, createTodo, selectTodos, updateTodo } from "../../todos/store/todo-slice";
 import TodoDroptarget from "../../todos/components/todo-droptarget";
 import { createPortal } from "react-dom";
-import TodoEditModal from "../../todos/components/todo-edit-modal";
+import TodoEditModal from "../../todos/components//todo-edit-modal/todo-edit-modal";
 import { ITodoDrag } from "../../todos/components/todo";
 import { useAppDispatch, useAppSelector } from "../../../store/redux-hooks";
 import { addXStepsToTimestamp, getTimeDiffInMinutes } from "../utils/date-utils";
 import { calendarStepInMinutes } from "./calendar-dashboard";
+import { createContext } from "react";
 
 
 interface Props {
@@ -22,22 +23,30 @@ type OutputGroup = {
     lastEndDate: Date,
 }
 
+export interface EditedTodoContextType {
+    editedTodo: ITodo,
+    updateEditedTodo: React.Dispatch<React.SetStateAction<ITodo | null>>,
+}
+export const EditedTodoContext = createContext<EditedTodoContextType>({} as EditedTodoContextType);
 
 const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
     const calendarFieldHeight = 48;
     const dispatch = useAppDispatch();
     const todoStore = useAppSelector(selectTodos);
+
     const [editedTodo, setEditedTodo] = useState<ITodo | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [todoDragStatus, setTodoDragStatus] = useState<ITodoDrag | null>(null);
     const todos = editedTodo ? todoStore.list.concat(editedTodo) : todoStore.list;
+
+
 
     const newTodo = (date: number) => {
         const newTodo = { id: todoStore.idCounter, dateStart: new Date(date), dateEnd: new Date(addXStepsToTimestamp(date, 1)), description: '' }
         startEditingTodo(newTodo);
     }
 
-    const startEditingTodo = (todo:ITodo) => {
+    const startEditingTodo = (todo: ITodo) => {
         setEditedTodo(todo);
         setShowModal(true);
     }
@@ -49,8 +58,8 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
 
     const saveTodo = (todo: ITodo) => {
         if (todo.dateEnd.getTime() <= todo.dateStart.getTime()) todo.dateEnd = new Date(addXStepsToTimestamp(todo.dateStart.getTime(), 1));
-        if(todoStore.list.find((t) => t.id === todo.id)) dispatch(updateTodo(todo));
-        else dispatch(createTodo({...todo}))
+        if (todoStore.list.find((t) => t.id === todo.id)) dispatch(updateTodo(todo));
+        else dispatch(createTodo({ ...todo }))
 
         if (editedTodo) setEditedTodo(null);
     }
@@ -66,21 +75,21 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
 
     const prepareTodosForDisplay = () => {
         let groups = groupTodos();
-        for(let group of groups){
-            for(let group2 of groups){
-                if(group.startDate < group2.startDate && group.startDate < group2.lastEndDate) group2.indent++;
+        for (let group of groups) {
+            for (let group2 of groups) {
+                if (group.startDate < group2.startDate && group.startDate < group2.lastEndDate) group2.indent++;
             }
         }
         return groups;
     }
 
     const groupTodos = () => {
-        let outputGroups:OutputGroup[] = [];
-        for(let todo of todos){
+        let outputGroups: OutputGroup[] = [];
+        for (let todo of todos) {
             let group = outputGroups.find(group => group.startDate.getTime() === todo.dateStart.getTime());
-            if(group){
+            if (group) {
                 group.todos.push(todo);
-                if(todo.dateEnd > group.lastEndDate) group.lastEndDate = todo.dateEnd;
+                if (todo.dateEnd > group.lastEndDate) group.lastEndDate = todo.dateEnd;
             } else {
                 let arr = [];
                 arr.push(todo);
@@ -100,14 +109,14 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
 
     return <>
         {editedTodo && showModal && createPortal(
-            <TodoEditModal 
-                todo={editedTodo}
-                saveTodo={saveTodo}
-                updateEditedTodo={setEditedTodo}
-                cancelEditingTodo={cancelEditingTodo}
-            />,
-            document.getElementById('modal') as Element)}
-
+            <EditedTodoContext.Provider value={{ editedTodo, updateEditedTodo: setEditedTodo }}>
+                <TodoEditModal
+                    saveTodo={saveTodo}
+                    cancelEditingTodo={cancelEditingTodo}
+                />
+            </EditedTodoContext.Provider>,
+            document.getElementById('modal') as Element)
+        }
         <div className={classes.container}>
             {intervalTimestamps.map((timestamp) => {
                 const group = todosToDisplay.find((group) => group.startDate.getTime() === timestamp.getTime());
@@ -142,6 +151,7 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
                 </TodoDroptarget>
             })}
         </div>
+
     </>
 }
 

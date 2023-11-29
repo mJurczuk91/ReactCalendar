@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../store/store";
+import { addXStepsToTimestamp, getTimeDiffInMinutes } from "../../calendar/utils/date-utils";
+import { calendarStepInMinutes } from "../../calendar/components/calendar-dashboard";
 
 export interface ITodo {
     id: number,
@@ -33,6 +35,15 @@ const TodoSlice = createSlice({
         },
     }
 });
+
+export const changeTodoStartDateKeepDuration = (todo:ITodo, newStartDate:Date):ITodo => {
+    const durationInMinutes = getTimeDiffInMinutes(todo.dateStart.getTime(), todo.dateEnd.getTime())
+    return {
+        ...todo,
+        dateStart: newStartDate,
+        dateEnd: new Date(addXStepsToTimestamp(newStartDate.getTime(), durationInMinutes / calendarStepInMinutes)),
+    }
+}
 
 export const { createTodo, updateTodo, deleteTodo } = TodoSlice.actions;
 export const selectTodos = (state: RootState) => state.todoSlice;
