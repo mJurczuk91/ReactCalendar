@@ -18,8 +18,8 @@ interface Props {
 type OutputGroup = {
     indent: number,
     todos: ITodo[],
-    startDate: number,
-    lastEndDate: number,
+    startDate: Date,
+    lastEndDate: Date,
 }
 
 
@@ -33,7 +33,7 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
     const todos = editedTodo ? todoStore.list.concat(editedTodo) : todoStore.list;
 
     const newTodo = (date: number) => {
-        const newTodo = { id: todoStore.idCounter, dateStart: date, dateEnd: addXStepsToTimestamp(date, 1), description: '' }
+        const newTodo = { id: todoStore.idCounter, dateStart: new Date(date), dateEnd: new Date(addXStepsToTimestamp(date, 1)), description: '' }
         startEditingTodo(newTodo);
     }
 
@@ -48,19 +48,19 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
     }
 
     const saveTodo = (todo: ITodo) => {
-        if (todo.dateEnd <= todo.dateStart) todo.dateEnd = addXStepsToTimestamp(todo.dateStart, 1);
+        if (todo.dateEnd.getTime() <= todo.dateStart.getTime()) todo.dateEnd = new Date(addXStepsToTimestamp(todo.dateStart.getTime(), 1));
         if(todoStore.list.find((t) => t.id === todo.id)) dispatch(updateTodo(todo));
         else dispatch(createTodo({...todo}))
 
         if (editedTodo) setEditedTodo(null);
     }
 
-    const moveTodo = (todo: ITodo, newStartDate: number) => {
-        const todoLength = getTimeDiffInMinutes(todo.dateStart, todo.dateEnd);
+    const moveTodo = (todo: ITodo, newStartDate: Date) => {
+        const todoLength = getTimeDiffInMinutes(todo.dateStart.getTime(), todo.dateEnd.getTime());
         saveTodo({
             ...todo,
             dateStart: newStartDate,
-            dateEnd: addXStepsToTimestamp(newStartDate, todoLength / calendarStepInMinutes),
+            dateEnd: new Date(addXStepsToTimestamp(newStartDate.getTime(), todoLength / calendarStepInMinutes)),
         });
     }
 
@@ -77,7 +77,7 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
     const groupTodos = () => {
         let outputGroups:OutputGroup[] = [];
         for(let todo of todos){
-            let group = outputGroups.find(group => group.startDate === todo.dateStart);
+            let group = outputGroups.find(group => group.startDate.getTime() === todo.dateStart.getTime());
             if(group){
                 group.todos.push(todo);
                 if(todo.dateEnd > group.lastEndDate) group.lastEndDate = todo.dateEnd;
@@ -110,7 +110,7 @@ const CalendarTodosManager: React.FC<Props> = ({ intervalTimestamps }) => {
 
         <div className={classes.container}>
             {intervalTimestamps.map((timestamp) => {
-                const group = todosToDisplay.find((group) => group.startDate === timestamp.getTime());
+                const group = todosToDisplay.find((group) => group.startDate.getTime() === timestamp.getTime());
                 return <TodoDroptarget
                     timestamp={timestamp.getTime()}
                     createTodo={newTodo}

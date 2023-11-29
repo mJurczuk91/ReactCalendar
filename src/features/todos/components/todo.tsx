@@ -24,11 +24,11 @@ export interface ITodoDrag {
 
 const Todo: React.FC<Props> = ({ todo, calendarFieldHeight, drag, todosInLine, placeInLine}) => {
 
-    const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart, todo.dateEnd));
+    const [currentHeight, setCurrentHeight] = useState<number>(calculateHeightInPixels(todo.dateStart.getTime(), todo.dateEnd.getTime()));
     const [pointerEvents, setPointerEvents] = useState<boolean>(true);
 
     useEffect(() => {
-        setCurrentHeight(calculateHeightInPixels(todo.dateStart, todo.dateEnd));
+        setCurrentHeight(calculateHeightInPixels(todo.dateStart.getTime(), todo.dateEnd.getTime()));
     }, [todo, calculateHeightInPixels])
 
     useEffect(() => {

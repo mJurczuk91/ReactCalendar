@@ -9,7 +9,7 @@ interface Props {
     timestamp: number;
     createTodo: (timestamp:number) => void,
     saveTodo: (todo:ITodo) => void,
-    moveTodo: (todo: ITodo, newStartDate:number) => void,
+    moveTodo: (todo: ITodo, newStartDate:Date) => void,
     drag: {status:ITodoDrag|null, setTodoDragStatus:React.Dispatch<React.SetStateAction<ITodoDrag|null>>},
     children?: React.ReactNode,
 }
@@ -19,7 +19,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children, saveTo
 
     const handleDragEnter = () => {
         setIsDraggedOver(true);
-        if(drag.status?.dragAction === TodoDragActions.resize) saveTodo({...drag.status.todo, dateEnd: addXStepsToTimestamp(timestamp, 1)});
+        if(drag.status?.dragAction === TodoDragActions.resize) saveTodo({...drag.status.todo, dateEnd: new Date(addXStepsToTimestamp(timestamp, 1))});
     }
 
     const handleDragLeave = () => {
@@ -34,7 +34,7 @@ const TodoDroptarget:React.FC<Props> = ({timestamp, createTodo, children, saveTo
 
     const handleDrop = (e:React.DragEvent) => {
         setIsDraggedOver(false);
-        if(drag.status?.dragAction === TodoDragActions.move) moveTodo(drag.status.todo, timestamp)
+        if(drag.status?.dragAction === TodoDragActions.move) moveTodo(drag.status.todo, new Date(timestamp))
         drag.setTodoDragStatus(null);
     }
 

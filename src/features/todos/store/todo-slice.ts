@@ -4,8 +4,8 @@ import { RootState } from "../../../store/store";
 export interface ITodo {
     id: number,
     description: string,
-    dateStart: number,
-    dateEnd: number,
+    dateStart: Date,
+    dateEnd: Date,
 }
 
 
